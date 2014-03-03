@@ -1,0 +1,7 @@
+name: ShoppingCartReloaded
+version: 1.0
+description: Shopping cart is reloaded
+author: limito
+
+main: me.limito.bukkit.shopcart.ShoppingCartReloaded
+depend: [ScalaLibPlugin]
