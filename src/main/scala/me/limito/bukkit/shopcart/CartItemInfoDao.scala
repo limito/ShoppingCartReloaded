@@ -2,7 +2,7 @@ package me.limito.bukkit.shopcart
 
 import java.sql.{ResultSet, Connection}
 
-class CartItemInfoDao(connection: Connection, config: DatabaseConfig) {
+class CartItemInfoDao(dataSource: JdbcDataSource, config: DatabaseConfig) {
   private val selectStatement = s"SELECT * FROM ${config.table} WHERE `${config.columnOwner}`= ?"
 
   def getItems(playerName: String, server: Int): List[CartItemInfo] = {
@@ -17,9 +17,9 @@ class CartItemInfoDao(connection: Connection, config: DatabaseConfig) {
   }
 
   private def withConnection[T](action: Connection => T): T = {
-    //var connection: Connection = null
+    var connection: Connection = null
     try {
-      //connection = dataSource.getConnection
+      connection = dataSource.connection()
       action(connection)
     } catch {
       case ex: Exception => throw new DaoException(ex)

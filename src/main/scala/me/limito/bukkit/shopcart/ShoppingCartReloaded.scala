@@ -8,9 +8,9 @@ class ShoppingCartReloaded extends JavaPlugin {
   var dao: CartItemInfoDao = _
 
   override def onEnable() {
-    val connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/shopcart", "root",  "")
+    val dataSource = new JdbcDataSource("jdbc:mysql://localhost:3306/shopcart", "root",  "", 4)
     val dbConfig = new DatabaseConfig("shopcart", "id", "type", "item", "player", "amount", "extra")
-    dao = new CartItemInfoDao(connection, dbConfig)
+    dao = new CartItemInfoDao(dataSource, dbConfig)
 
     dao.getItems("limito", 0) foreach(println)
   }
