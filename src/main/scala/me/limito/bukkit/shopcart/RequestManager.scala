@@ -9,6 +9,7 @@ import collection.mutable
  */
 class RequestManager(val plugin: ShoppingCartReloaded) {
   val locksMap = mutable.Map[CommandSender, Request]()
+  def lang = plugin.lang
 
   def handleRequest(request: Request) {
     require(request.requestManager == this)
@@ -16,7 +17,7 @@ class RequestManager(val plugin: ShoppingCartReloaded) {
     if (checkLock(request))
       request.handle()
     else
-      request.commandSender.sendMessage("Подождите, пока завершится предыдущий запрос")
+      request.commandSender.sendMessage(lang.get("cart-get.try-later"))
   }
 
   def onCompleted(request: Request) {

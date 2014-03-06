@@ -5,3 +5,6 @@ author: limito
 
 main: me.limito.bukkit.shopcart.ShoppingCartReloaded
 depend: [ScalaLibPlugin]
+
+commands:
+  cart:

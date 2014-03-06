@@ -9,7 +9,19 @@ abstract class Request(val requestManager: RequestManager, val commandSender: Co
   /** Здесь идет первичная обработка запроса (в игровом потоке) **/
   def handle()
 
+  def withDatabase(f: () => Unit) {
+    DatabaseScheduler.schedule(f)
+  }
+
+  def withBukkit(f: () => Unit) {
+    requestManager.plugin.getServer.getScheduler.scheduleSyncDelayedTask(requestManager.plugin, new Runnable {
+      def run() {f()}
+    })
+  }
+
   def completed() {
     requestManager.onCompleted(this)
   }
+
+  def lang = requestManager.lang
 }
