@@ -7,7 +7,7 @@ class CartItemInfoDao(dataSource: JdbcDataSource, config: DatabaseConfig) {
   private val selectStatementById = s"SELECT * FROM ${config.table} WHERE `${config.columnId}`= ?"
   private val updateAmountStatement = s"UPDATE ${config.table} SET `${config.columnAmount}`=? WHERE `${config.columnId}`= ?"
 
-  def getItems(playerName: String, server: Int): List[CartItemInfo] = {
+  def getItemInfos(playerName: String, server: Int): List[CartItemInfo] = {
     withConnection(
       conn => {
         val query = conn.prepareStatement(selectAllStatement)

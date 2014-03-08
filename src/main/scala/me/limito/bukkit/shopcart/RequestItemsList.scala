@@ -6,7 +6,7 @@ class RequestItemsList(requestManager: RequestManager, commandSender: CommandSen
   def handle() {
     withDatabase(() => {
       val playerName = commandSender.getName
-      val itemsInfo = requestManager.plugin.dao.getItems(playerName, 0)
+      val itemsInfo = requestManager.plugin.dao.getItemInfos(playerName, 0)
       val items = itemsInfo map (_.toItem)
       val outLines = items map (item => lang.format("cart.item", item.info.id, item.getLocalizedName(lang), item.info.amount))
 

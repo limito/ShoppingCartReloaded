@@ -6,6 +6,7 @@ import java.io.File
 import org.bukkit.configuration.file.YamlConfiguration
 import java.util.logging.Level
 import org.bukkit.command.{Command, CommandSender, CommandExecutor}
+import scala.Predef.augmentString
 
 class ShoppingCartReloaded extends JavaPlugin {
   val requestManager: RequestManager = new RequestManager(this)
@@ -64,13 +65,28 @@ class ShoppingCartReloaded extends JavaPlugin {
   }
 
   override def onCommand(sender: CommandSender, command: Command, label: String, args: Array[String]): Boolean = {
-    if (args.length >= 1) {
-      val req = new RequestItemGive(requestManager, sender, args(0).toInt, if (args.length >= 2) args(1).toInt else Int.MaxValue)
-      requestManager.handleRequest(req)
-    } else {
-      val req = new RequestItemsList(requestManager, sender)
-      requestManager.handleRequest(req)
+    args match {
+      case Array("get", itemId, itemAmount) => {
+        val req = new RequestItemGive(requestManager, sender, itemId.toInt, itemAmount.toInt)
+        requestManager.handleRequest(req)
+        true
+      }
+      case Array("get", itemId) => {
+        val req = new RequestItemGive(requestManager, sender, itemId.toInt, Int.MaxValue)
+        requestManager.handleRequest(req)
+        true
+      }
+      case Array("all") => {
+        val req = new RequestGiveAll(requestManager, sender)
+        requestManager.handleRequest(req)
+        true
+      }
+      case Array() => {
+        val req = new RequestItemsList(requestManager, sender)
+        requestManager.handleRequest(req)
+        true
+      }
+      case _ => false
     }
-    true
   }
 }

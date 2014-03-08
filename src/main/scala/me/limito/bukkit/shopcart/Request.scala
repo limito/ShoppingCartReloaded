@@ -21,6 +21,15 @@ abstract class Request(val requestManager: RequestManager, val commandSender: Co
     })
   }
 
+  def sendMessages(messages: Seq[String]) {
+    val array = messages.toArray
+    requestManager.plugin.getServer.getScheduler.scheduleSyncDelayedTask(requestManager.plugin, new Runnable {
+      def run() {
+        commandSender.sendMessage(array)
+      }
+    })
+  }
+
   def sendMessage(message: String) {
     requestManager.plugin.getServer.getScheduler.scheduleSyncDelayedTask(requestManager.plugin, new Runnable {
       def run() {
