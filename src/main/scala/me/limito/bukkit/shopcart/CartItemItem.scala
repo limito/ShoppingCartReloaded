@@ -14,7 +14,7 @@ class CartItemItem(info: CartItemInfo, val itemId: Int, val itemMeta: Short, val
     give(player.getInventory, stack, amount)
   }
 
-  def getLocalizedName(lang: Lang): String = itemId + ":" + itemMeta
+  def getLocalizedName(lang: Lang): String = lang.getItemName(itemId, itemMeta)
 
   def getYouGetMessage(amount: Int, lang: Lang): String = lang.format("cart-get.get", getLocalizedName(lang), amount)
 
