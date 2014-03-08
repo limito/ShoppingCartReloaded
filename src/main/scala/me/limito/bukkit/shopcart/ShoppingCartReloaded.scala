@@ -7,6 +7,7 @@ import org.bukkit.configuration.file.YamlConfiguration
 import java.util.logging.Level
 import org.bukkit.command.{Command, CommandSender, CommandExecutor}
 import scala.Predef.augmentString
+import org.bukkit.entity.Player
 
 class ShoppingCartReloaded extends JavaPlugin {
   val requestManager: RequestManager = new RequestManager(this)
@@ -94,6 +95,17 @@ class ShoppingCartReloaded extends JavaPlugin {
         val req = new RequestGiveAll(requestManager, sender)
         requestManager.handleRequest(req)
         true
+      }
+      case Array("put") => {
+        if (sender.isInstanceOf[Player]) {
+          val stack = sender.asInstanceOf[Player].getItemInHand
+          if (stack != null && stack.getTypeId > 0) {
+            val req = new RequestPutItem(requestManager, sender, sender.getName, stack.clone(), stack.getAmount)
+            requestManager.handleRequest(req)
+            true
+          }
+        }
+        false
       }
       case Array() => {
         val req = new RequestItemsList(requestManager, sender)

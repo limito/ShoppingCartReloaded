@@ -1,11 +1,33 @@
 package me.limito.bukkit.shopcart
 
-import java.sql.{PreparedStatement, ResultSet, Connection}
+import java.sql.{Statement, PreparedStatement, ResultSet, Connection}
 
 class CartItemInfoDao(dataSource: JdbcDataSource, config: DatabaseConfig) {
-  private val selectAllStatement = s"SELECT * FROM ${config.table} WHERE `${config.columnOwner}`= ?"
-  private val selectStatementById = s"SELECT * FROM ${config.table} WHERE `${config.columnId}`= ?"
+  private val columnNames = s"`${config.columnId}`,`${config.columnType}`,`${config.columnItem}`,`${config.columnOwner}`,`${config.columnAmount}`,`${config.columnExtra}`"
+
+  private val insertStatement = s"INSERT INTO `${config.table}`($columnNames) VALUES (DEFAULT, ?, ?, ?, ?, ?)"
+  private val selectAllStatement = s"SELECT $columnNames FROM ${config.table} WHERE `${config.columnOwner}`= ?"
+  private val selectStatementById = s"SELECT $columnNames FROM ${config.table} WHERE `${config.columnId}`= ?"
   private val updateAmountStatement = s"UPDATE ${config.table} SET `${config.columnAmount}`=? WHERE `${config.columnId}`= ?"
+
+  def addItem(info: CartItemInfo): Long = {
+    withConnection(
+      conn => {
+        val query = conn.prepareStatement(insertStatement, Statement.RETURN_GENERATED_KEYS)
+        withPrepStatement(query) {
+          query.setString(1, info.itemType)
+          query.setString(2, info.item)
+          query.setString(3, info.owner)
+          query.setInt(4, info.amount)
+          query.setString(5, info.extra)
+          query.executeUpdate()
+          val result = query.getGeneratedKeys
+          result.next()
+          result.getLong(1)
+        }
+      }
+    )
+  }
 
   def getItemInfos(playerName: String, server: Int): List[CartItemInfo] = {
     withConnection(
@@ -70,7 +92,7 @@ class CartItemInfoDao(dataSource: JdbcDataSource, config: DatabaseConfig) {
   }
 
   private def parseResultSet(rs: ResultSet): List[CartItemInfo] = parseResultSet(rs, Nil)
-  private def parseResultSet(rs: ResultSet, list: List[CartItemInfo]): List[CartItemInfo] = if (rs.next()) parseInfo(rs) :: list else list
+  private def parseResultSet(rs: ResultSet, list: List[CartItemInfo]): List[CartItemInfo] = if (rs.next()) parseInfo(rs) :: parseResultSet(rs, list) else list
 
   private def parseInfo(rs: ResultSet):CartItemInfo = {
     val id = rs.getInt(config.columnId)
