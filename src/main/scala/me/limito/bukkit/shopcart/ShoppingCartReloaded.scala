@@ -64,8 +64,13 @@ class ShoppingCartReloaded extends JavaPlugin {
   }
 
   override def onCommand(sender: CommandSender, command: Command, label: String, args: Array[String]): Boolean = {
-    val req = new RequestItemsList(requestManager, sender)
-    requestManager.handleRequest(req)
+    if (args.length >= 1) {
+      val req = new RequestItemGive(requestManager, sender, args(0).toInt, if (args.length >= 2) args(1).toInt else Int.MaxValue)
+      requestManager.handleRequest(req)
+    } else {
+      val req = new RequestItemsList(requestManager, sender)
+      requestManager.handleRequest(req)
+    }
     true
   }
 }

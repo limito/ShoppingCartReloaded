@@ -9,6 +9,8 @@ abstract class Request(val requestManager: RequestManager, val commandSender: Co
   /** Здесь идет первичная обработка запроса (в игровом потоке) **/
   def handle()
 
+  def dao = requestManager.plugin.dao
+
   def withDatabase(f: () => Unit) {
     DatabaseScheduler.schedule(f)
   }
@@ -16,6 +18,14 @@ abstract class Request(val requestManager: RequestManager, val commandSender: Co
   def withBukkit(f: () => Unit) {
     requestManager.plugin.getServer.getScheduler.scheduleSyncDelayedTask(requestManager.plugin, new Runnable {
       def run() {f()}
+    })
+  }
+
+  def sendMessage(message: String) {
+    requestManager.plugin.getServer.getScheduler.scheduleSyncDelayedTask(requestManager.plugin, new Runnable {
+      def run() {
+        commandSender.sendMessage(message)
+      }
     })
   }
 

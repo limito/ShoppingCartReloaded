@@ -1,19 +1,59 @@
 package me.limito.bukkit.shopcart
 
-import java.sql.{ResultSet, Connection}
+import java.sql.{PreparedStatement, ResultSet, Connection}
 
 class CartItemInfoDao(dataSource: JdbcDataSource, config: DatabaseConfig) {
-  private val selectStatement = s"SELECT * FROM ${config.table} WHERE `${config.columnOwner}`= ?"
+  private val selectAllStatement = s"SELECT * FROM ${config.table} WHERE `${config.columnOwner}`= ?"
+  private val selectStatementById = s"SELECT * FROM ${config.table} WHERE `${config.columnId}`= ?"
+  private val updateAmountStatement = s"UPDATE ${config.table} SET `${config.columnAmount}`=? WHERE `${config.columnId}`= ?"
 
   def getItems(playerName: String, server: Int): List[CartItemInfo] = {
     withConnection(
       conn => {
-        val query = conn.prepareStatement(selectStatement)
-        query.setString(1, playerName)
-        val resultSet = query.executeQuery()
-        parseResultSet(resultSet)
+        val query = conn.prepareStatement(selectAllStatement)
+        withPrepStatement(query) {
+          query.setString(1, playerName)
+          val resultSet = query.executeQuery()
+          parseResultSet(resultSet)
+        }
       }
     )
+  }
+
+  def getItemInfoById(id: Long): Option[CartItemInfo] = {
+    withConnection(
+      conn => {
+        val query = conn.prepareStatement(selectStatementById)
+        withPrepStatement(query) {
+          query.setLong(1, id)
+          val resultSet = query.executeQuery()
+          parseResultSet(resultSet).headOption
+        }
+      }
+    )
+  }
+
+  def updateItemsAmount(items: List[CartItemInfo]) {
+    withConnection(
+      conn => {
+        val query = conn.prepareStatement(updateAmountStatement)
+        withPrepStatement(query) {
+          items foreach (item => {
+            query.setInt(1, item.amount)
+            query.setLong(2, item.id)
+            query.executeUpdate()
+          })
+        }
+      }
+    )
+  }
+
+  private def withPrepStatement[T](statement: PreparedStatement)(action: => T): T = {
+    try {
+      action
+    } finally {
+      statement.close()
+    }
   }
 
   private def withConnection[T](action: Connection => T): T = {
