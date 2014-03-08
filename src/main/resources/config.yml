@@ -1,0 +1,12 @@
+db:
+  url: jdbc:mysql://localhost:3306/shopcart
+  username: shopcart
+  password: shopcart
+  table: shopcart
+  column:
+    id: id
+    player: player
+    type: type
+    item: item
+    amount: amount
+    extra: extra

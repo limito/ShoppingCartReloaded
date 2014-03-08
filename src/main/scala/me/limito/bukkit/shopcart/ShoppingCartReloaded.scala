@@ -13,15 +13,10 @@ class ShoppingCartReloaded extends JavaPlugin {
   var dao: CartItemInfoDao = _
 
   override def onEnable() {
-    val dataSource = new JdbcDataSource("jdbc:mysql://localhost:3306/shopcart", "root",  "", 4)
-    val dbConfig = new DatabaseConfig("shopcart", "id", "type", "item", "player", "amount", "extra")
-    dao = new CartItemInfoDao(dataSource, dbConfig)
-
-    dao.getItems("limito", 0) foreach(println)
+    loadMessages()
+    initDatabase()
 
     getServer.getPluginCommand("cart").setExecutor(this)
-
-    loadMessages()
   }
 
   override def onDisable() {
@@ -39,6 +34,33 @@ class ShoppingCartReloaded extends JavaPlugin {
     } catch {
       case e: Exception => getLogger.log(Level.SEVERE, s"Error loading messages", e)
     }
+  }
+
+  def initDatabase() {
+    val dbConfig = loadDatabaseConfig()
+
+    val dataSource = new JdbcDataSource(dbConfig.url, dbConfig.username,  dbConfig.password, 4)
+    dao = new CartItemInfoDao(dataSource, dbConfig)
+  }
+
+  def loadDatabaseConfig(): DatabaseConfig = {
+    saveDefaultConfig()
+    val section = getConfig.getConfigurationSection("db")
+
+    val url = section.getString("url")
+    val username = section.getString("username")
+    val password = section.getString("password")
+    val table = section.getString("table")
+
+    val columnSection = section.getConfigurationSection("column")
+    val cId = columnSection.getString("id")
+    val cPlayer = columnSection.getString("player")
+    val cType = columnSection.getString("type")
+    val cItem = columnSection.getString("item")
+    val cAmount = columnSection.getString("amount")
+    val cExtra = columnSection.getString("extra")
+
+    new DatabaseConfig(url, username, password, table, cId, cType, cItem, cPlayer, cAmount, cExtra)
   }
 
   override def onCommand(sender: CommandSender, command: Command, label: String, args: Array[String]): Boolean = {
