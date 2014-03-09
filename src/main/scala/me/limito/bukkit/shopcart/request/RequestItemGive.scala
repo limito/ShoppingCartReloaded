@@ -5,6 +5,8 @@ import org.bukkit.entity.Player
 
 class RequestItemGive(requestManager: RequestManager, commandSender: CommandSender, itemId: Int, itemAmount: Int) extends Request(requestManager, commandSender) {
   def handle() {
+    requirePermission("cart.get")
+
     if (!commandSender.isInstanceOf[Player]) {
       sendMessage(lang.get("cart.not-a-player"))
       return

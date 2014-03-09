@@ -15,8 +15,13 @@ class RequestManager(val plugin: ShoppingCartReloaded) {
   def handleRequest(request: Request) {
     require(request.requestManager == this)
 
-    if (checkLock(request))
-      request.handle()
+    if (checkLock(request)) {
+      try {
+        request.handle()
+      } catch {
+        case e: NoPermissionException => request.commandSender.sendMessage(lang.get("cart.no-perms"))
+      }
+    }
     else
       request.commandSender.sendMessage(lang.get("cart-get.try-later"))
   }

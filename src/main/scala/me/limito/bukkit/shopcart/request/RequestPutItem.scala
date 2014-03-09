@@ -7,6 +7,8 @@ import me.limito.bukkit.shopcart.items.CartItemInfo
 class RequestPutItem(requestManager: RequestManager, commandSender: CommandSender, owner: String, itemStack: ItemStack, amount: Int) extends Request(requestManager, commandSender) {
   /** Здесь идет первичная обработка запроса (в игровом потоке) **/
   def handle() {
+    requirePermission("cart.put")
+
     val info = createInfo(itemStack)
     withDatabase(() => {
       val id = dao.addItem(info)

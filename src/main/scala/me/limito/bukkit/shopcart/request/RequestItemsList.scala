@@ -4,6 +4,8 @@ import org.bukkit.command.CommandSender
 
 class RequestItemsList(requestManager: RequestManager, commandSender: CommandSender) extends Request(requestManager, commandSender) {
   def handle() {
+    requirePermission("cart.list")
+
     withDatabase(() => {
       val playerName = commandSender.getName
       val itemsInfo = requestManager.plugin.dao.getItemInfos(playerName, 0)

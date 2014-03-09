@@ -22,6 +22,11 @@ abstract class Request(val requestManager: RequestManager, val commandSender: Co
     })
   }
 
+  def requirePermission(permission: String) {
+    if (!commandSender.hasPermission(permission))
+      throw new NoPermissionException(permission)
+  }
+
   def sendMessages(messages: Seq[String]) {
     val array = messages.toArray
     requestManager.plugin.getServer.getScheduler.scheduleSyncDelayedTask(requestManager.plugin, new Runnable {

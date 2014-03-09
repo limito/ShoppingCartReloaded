@@ -9,6 +9,8 @@ class RequestGiveAll(requestManager: RequestManager, commandSender: CommandSende
   case class ItemGiveInfo(item: CartItem, amount: Int)
 
   def handle() {
+    requirePermission("cart.get")
+
     if (!commandSender.isInstanceOf[Player]) {
       sendMessage(lang.get("cart.not-a-player"))
       return
