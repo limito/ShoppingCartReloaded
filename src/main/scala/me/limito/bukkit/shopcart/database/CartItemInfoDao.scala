@@ -9,7 +9,8 @@ class CartItemInfoDao(dataSource: JdbcDataSource, config: DatabaseConfig) {
   private val insertStatement = s"INSERT INTO `${config.table}`($columnNames) VALUES (DEFAULT, ?, ?, ?, ?, ?)"
   private val selectAllStatement = s"SELECT $columnNames FROM ${config.table} WHERE `${config.columnOwner}`= ?"
   private val selectStatementById = s"SELECT $columnNames FROM ${config.table} WHERE `${config.columnId}`= ?"
-  private val updateAmountStatement = s"UPDATE ${config.table} SET `${config.columnAmount}`=? WHERE `${config.columnId}`= ?"
+  private val updateAmountStatement = s"UPDATE `${config.table}` SET `${config.columnAmount}`=? WHERE `${config.columnId}`= ?"
+  private val deleteItemStatement = s"DELETE FROM `${config.table}` WHERE `${config.columnId}`=?"
 
   def addItem(info: CartItemInfo): Long = {
     withConnection(
@@ -61,11 +62,19 @@ class CartItemInfoDao(dataSource: JdbcDataSource, config: DatabaseConfig) {
       conn => {
         val query = conn.prepareStatement(updateAmountStatement)
         withPrepStatement(query) {
-          items foreach (item => {
+          for (item <- items; if item.amount > 0) {
             query.setInt(1, item.amount)
             query.setLong(2, item.id)
             query.executeUpdate()
-          })
+          }
+        }
+
+        val deleteQuery = conn.prepareStatement(deleteItemStatement)
+        withPrepStatement(deleteQuery) {
+          for (item <- items; if item.amount <= 0) {
+            deleteQuery.setLong(1, item.id)
+            deleteQuery.executeUpdate()
+          }
         }
       }
     )
