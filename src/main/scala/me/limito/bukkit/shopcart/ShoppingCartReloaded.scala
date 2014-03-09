@@ -1,11 +1,13 @@
 package me.limito.bukkit.shopcart
 
+import database.{CartItemInfoDao, JdbcDataSource, DatabaseConfig}
 import org.bukkit.plugin.java.JavaPlugin
 import java.sql.DriverManager
 import java.io.File
 import org.bukkit.configuration.file.YamlConfiguration
 import java.util.logging.Level
 import org.bukkit.command.{Command, CommandSender, CommandExecutor}
+import request._
 import scala.Predef.augmentString
 import org.bukkit.entity.Player
 

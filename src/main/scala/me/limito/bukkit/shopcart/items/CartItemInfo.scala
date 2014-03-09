@@ -1,4 +1,4 @@
-package me.limito.bukkit.shopcart
+package me.limito.bukkit.shopcart.items
 
 class CartItemInfo(var id: java.lang.Long, var itemType: String, var item: String, var owner: String, var amount: Int, var extra: String) {
   override def toString = id + ": " + item

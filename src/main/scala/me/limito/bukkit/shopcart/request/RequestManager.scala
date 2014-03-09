@@ -1,7 +1,8 @@
-package me.limito.bukkit.shopcart
+package me.limito.bukkit.shopcart.request
 
 import org.bukkit.command.CommandSender
 import collection.mutable
+import me.limito.bukkit.shopcart.ShoppingCartReloaded
 
 /**
  * Задача: контроллировать запросы от игроков: не давать запускать сразу несколько запросов на запись в БД, защита от флуда и т.д.

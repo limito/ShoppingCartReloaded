@@ -1,7 +1,8 @@
-package me.limito.bukkit.shopcart
+package me.limito.bukkit.shopcart.items
 
 import org.bukkit.entity.Player
 import org.bukkit.inventory.{Inventory, ItemStack}
+import me.limito.bukkit.shopcart.Lang
 
 class CartItemItem(info: CartItemInfo, val itemId: Int, val itemMeta: Short, val amount: Int, val nbtData: String) extends CartItem(info) {
   def giveToPlayer(player: Player):Int = {

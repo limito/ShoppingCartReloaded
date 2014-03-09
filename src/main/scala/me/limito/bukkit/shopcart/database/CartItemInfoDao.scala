@@ -1,6 +1,7 @@
-package me.limito.bukkit.shopcart
+package me.limito.bukkit.shopcart.database
 
 import java.sql.{Statement, PreparedStatement, ResultSet, Connection}
+import me.limito.bukkit.shopcart.items.CartItemInfo
 
 class CartItemInfoDao(dataSource: JdbcDataSource, config: DatabaseConfig) {
   private val columnNames = s"`${config.columnId}`,`${config.columnType}`,`${config.columnItem}`,`${config.columnOwner}`,`${config.columnAmount}`,`${config.columnExtra}`"

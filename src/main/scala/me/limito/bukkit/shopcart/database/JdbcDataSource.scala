@@ -1,4 +1,4 @@
-package me.limito.bukkit.shopcart
+package me.limito.bukkit.shopcart.database
 
 import java.util.concurrent.{TimeUnit, LinkedBlockingQueue}
 import java.sql.{DriverManager, Connection}

@@ -1,4 +1,4 @@
-package me.limito.bukkit.shopcart
+package me.limito.bukkit.shopcart.database
 
 import java.sql._
 import java.util.Properties

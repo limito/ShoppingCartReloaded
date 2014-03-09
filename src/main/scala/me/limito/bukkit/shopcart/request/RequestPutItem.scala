@@ -1,7 +1,8 @@
-package me.limito.bukkit.shopcart
+package me.limito.bukkit.shopcart.request
 
 import org.bukkit.command.CommandSender
 import org.bukkit.inventory.ItemStack
+import me.limito.bukkit.shopcart.items.CartItemInfo
 
 class RequestPutItem(requestManager: RequestManager, commandSender: CommandSender, owner: String, itemStack: ItemStack, amount: Int) extends Request(requestManager, commandSender) {
   /** Здесь идет первичная обработка запроса (в игровом потоке) **/

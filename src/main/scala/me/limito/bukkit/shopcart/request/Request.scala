@@ -1,6 +1,7 @@
-package me.limito.bukkit.shopcart
+package me.limito.bukkit.shopcart.request
 
 import org.bukkit.command.CommandSender
+import me.limito.bukkit.shopcart.database.DatabaseScheduler
 
 abstract class Request(val requestManager: RequestManager, val commandSender: CommandSender) {
   /** Игрок не может одновременно запускать несколько вопросов с mustLock=true */

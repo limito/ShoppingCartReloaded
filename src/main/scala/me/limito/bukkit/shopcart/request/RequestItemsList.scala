@@ -1,4 +1,4 @@
-package me.limito.bukkit.shopcart
+package me.limito.bukkit.shopcart.request
 
 import org.bukkit.command.CommandSender
 

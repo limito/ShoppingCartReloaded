@@ -1,8 +1,9 @@
-package me.limito.bukkit.shopcart
+package me.limito.bukkit.shopcart.request
 
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import collection.mutable.ListBuffer
+import me.limito.bukkit.shopcart.items.CartItem
 
 class RequestGiveAll(requestManager: RequestManager, commandSender: CommandSender) extends Request(requestManager, commandSender) {
   case class ItemGiveInfo(item: CartItem, amount: Int)
