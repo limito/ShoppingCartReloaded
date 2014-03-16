@@ -19,6 +19,7 @@ class ShoppingCartReloaded extends JavaPlugin {
   override def onEnable() {
     loadMessages()
     loadItemNames()
+    loadEnchantmentNames()
     initDatabase()
 
     getServer.getPluginCommand("cart").setExecutor(this)
@@ -51,6 +52,19 @@ class ShoppingCartReloaded extends JavaPlugin {
       lang.readItems(config)
     } catch {
       case e: Exception => getLogger.log(Level.SEVERE, s"Error loading item names", e)
+    }
+  }
+
+  def loadEnchantmentNames() {
+    try {
+      val fileName = "enchantments.yml"
+
+      saveResource(fileName, false)
+      val file = new File(getDataFolder, fileName)
+      val config = YamlConfiguration.loadConfiguration(file)
+      lang.readEnchantments(config.getConfigurationSection("enchantments"))
+    } catch {
+      case e: Exception => getLogger.log(Level.SEVERE, s"Error loading enchantment names", e)
     }
   }
 

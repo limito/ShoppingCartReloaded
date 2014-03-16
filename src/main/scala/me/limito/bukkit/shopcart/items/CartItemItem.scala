@@ -3,19 +3,26 @@ package me.limito.bukkit.shopcart.items
 import org.bukkit.entity.Player
 import org.bukkit.inventory.{Inventory, ItemStack}
 import me.limito.bukkit.shopcart.Lang
+import org.bukkit.enchantments.Enchantment
 
-class CartItemItem(info: CartItemInfo, val itemId: Int, val itemMeta: Short, val amount: Int, val nbtData: String) extends CartItem(info) {
-  def giveToPlayer(player: Player):Int = {
-    val stack = new ItemStack(itemId, 1, itemMeta)
-    give(player.getInventory, stack, amount)
-  }
+class CartItemItem(info: CartItemInfo, val itemId: Int, val itemMeta: Short, val amount: Int, val enchantments: Array[LeveledEnchantment], val nbtData: String) extends CartItem(info) {
+  def giveToPlayer(player: Player):Int = giveToPlayer(player, amount)
 
   def giveToPlayer(player: Player, amount: Int):Int = {
     val stack = new ItemStack(itemId, 1, itemMeta)
+    if (enchantments != null)
+      enchantments foreach(e => stack.addUnsafeEnchantment(Enchantment.getById(e.id), e.level))
+
     give(player.getInventory, stack, amount)
   }
 
-  def getLocalizedName(lang: Lang): String = lang.getItemName(itemId, itemMeta)
+  def getLocalizedName(lang: Lang): String = {
+    val name = lang.getItemName(itemId, itemMeta)
+    if (enchantments != null)
+      name + " " + lang.formatEnchantments(enchantments)
+    else
+      name
+  }
 
   def getYouGetMessage(amount: Int, lang: Lang): String = lang.format("cart-get.get", getLocalizedName(lang), amount)
 

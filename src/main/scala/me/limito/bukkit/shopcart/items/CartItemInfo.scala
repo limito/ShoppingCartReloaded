@@ -1,5 +1,6 @@
 package me.limito.bukkit.shopcart.items
 
+
 class CartItemInfo(var id: java.lang.Long, var itemType: String, var item: String, var owner: String, var amount: Int, var extra: String) {
   override def toString = id + ": " + item
 
@@ -14,5 +15,16 @@ class CartItemInfo(var id: java.lang.Long, var itemType: String, var item: Strin
     }
   }
 
-  private def toMinecraftItem: CartItemItem = new CartItemItem(this, item.toInt, 0, amount, null)
+  private def toMinecraftItem: CartItemItem = {
+    val Array(main, enchants @ _*) = item.split("#", 2)
+    val Array(id, meta @ _*) = main.split(":", 2)
+
+    val ench = if(enchants.size > 0) parsePoundEnchantments(enchants(0)) else null
+    new CartItemItem(this, id.toInt, if (meta.isEmpty) 0 else meta.head.toShort, amount, ench, null)
+  }
+
+  private def parsePoundEnchantments(str: String): Array[LeveledEnchantment] = str.split("#").map (d => {
+    val Array(id, level) = d.split(":")
+    new LeveledEnchantment(id.toInt, level.toInt)
+  })
 }
