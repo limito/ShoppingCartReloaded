@@ -13,20 +13,26 @@ import org.bukkit.entity.Player
 
 class ShoppingCartReloaded extends JavaPlugin {
   val requestManager: RequestManager = new RequestManager(this)
-  val lang = new Lang
+  var lang = new Lang
   var dao: CartItemInfoDao = _
 
   override def onEnable() {
-    loadMessages()
-    loadItemNames()
-    loadEnchantmentNames()
-    initDatabase()
 
     getServer.getPluginCommand("cart").setExecutor(this)
   }
 
   override def onDisable() {
 
+  }
+
+  def reload() {
+    lang = new Lang()
+    dao = null
+
+    loadMessages()
+    loadItemNames()
+    loadEnchantmentNames()
+    initDatabase()
   }
 
   def loadMessages() {
@@ -97,6 +103,7 @@ class ShoppingCartReloaded extends JavaPlugin {
 
   override def onCommand(sender: CommandSender, command: Command, label: String, args: Array[String]): Boolean = {
     args match {
+      case Array("reload") if sender.hasPermission("cart.reload") => reload(); true
       case Array("get", itemId, itemAmount) => {
         val req = new RequestItemGive(requestManager, sender, itemId.toInt, itemAmount.toInt)
         requestManager.handleRequest(req)
