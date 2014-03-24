@@ -6,16 +6,20 @@ import me.limito.bukkit.shopcart.items.CartItemInfo
 import org.bukkit.enchantments.Enchantment
 import collection.JavaConversions._
 
-class RequestPutItem(requestManager: RequestManager, commandSender: CommandSender, owner: String, itemStack: ItemStack, amount: Int) extends Request(requestManager, commandSender) {
-  /** Здесь идет первичная обработка запроса (в игровом потоке) **/
-  def handle() {
+class RequestPutItem(commandSender: CommandSender, owner: String, itemStack: ItemStack, amount: Int) extends Request(commandSender) {
+  private var info: CartItemInfo = _
+
+  /** Здесь идет проверка условий для выполнения запроса (например, проверка наличия пермов) **/
+  override def prehandle() {
     requirePermission("cart.put")
 
-    val info = createInfo(itemStack)
-    withDatabase(() => {
-      val id = dao.addItem(info)
-      sendMessage(s"Item added (id: $id)")
-    })
+    info = createInfo(itemStack)
+  }
+
+  def handle() {
+    val id = dao.addItem(info)
+
+    sendMessage(s"Item added (id: $id)")
   }
 
   private def createInfo(itemStack: ItemStack):CartItemInfo = {
@@ -25,5 +29,5 @@ class RequestPutItem(requestManager: RequestManager, commandSender: CommandSende
     new CartItemInfo(null, "item", itemName + enchInfo, owner, amount, null)
   }
 
-  private def createEnchantmentsInfo(enchs: java.util.Map[Enchantment, Integer]):String = (for ((id, level) <- enchs) yield (id.getId + ":" + level)).mkString("#")
+  private def createEnchantmentsInfo(enchs: java.util.Map[Enchantment, Integer]):String = (for ((id, level) <- enchs) yield id.getId + ":" + level).mkString("#")
 }

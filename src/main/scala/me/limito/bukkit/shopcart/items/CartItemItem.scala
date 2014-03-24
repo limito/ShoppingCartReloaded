@@ -5,7 +5,7 @@ import org.bukkit.inventory.{Inventory, ItemStack}
 import me.limito.bukkit.shopcart.Lang
 import org.bukkit.enchantments.Enchantment
 
-class CartItemItem(info: CartItemInfo, val itemId: Int, val itemMeta: Short, val amount: Int, val enchantments: Array[LeveledEnchantment], val nbtData: String) extends CartItem(info) {
+class CartItemItem(val itemId: Int, val itemMeta: Short, val amount: Int, val enchantments: Array[LeveledEnchantment], val nbtData: String) extends CartItem {
   def giveToPlayer(player: Player):Int = giveToPlayer(player, amount)
 
   def giveToPlayer(player: Player, amount: Int):Int = {

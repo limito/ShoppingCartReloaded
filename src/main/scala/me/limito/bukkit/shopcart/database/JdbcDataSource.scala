@@ -1,16 +1,25 @@
 package me.limito.bukkit.shopcart.database
 
 import java.util.concurrent.{TimeUnit, LinkedBlockingQueue}
-import java.sql.{DriverManager, Connection}
+import java.sql.{SQLException, DriverManager, Connection}
 import java.util.concurrent.atomic.AtomicInteger
+import me.limito.bukkit.shopcart.ShoppingCartReloaded
+import java.util.logging.Level
+import collection.JavaConversions._
 
 class JdbcDataSource(val url: String, val username: String, val password: String, val poolSize: Int) {
   private val freeConnections = new LinkedBlockingQueue[PooledConnection]()
   private val connCounter = new AtomicInteger()
+  private val logger = ShoppingCartReloaded.instance.getLogger
 
-  def connection(): Connection = synchronized {
+  private var working = true
+
+  def connection(): Connection = this.synchronized {
     var connection: PooledConnection = null
     while (connection == null) {
+      if (!working)
+        throw new SQLException("Data source is closed")
+
       connection = freeConnections.poll(50, TimeUnit.MILLISECONDS)
       if (connection != null && !checkConnection(connection)) {
         connection = null
@@ -24,7 +33,28 @@ class JdbcDataSource(val url: String, val username: String, val password: String
   }
 
   def returnConnection(conn: PooledConnection) {
-    freeConnections.add(conn)
+    this.synchronized {
+      if (working)
+        freeConnections.add(conn)
+      else
+        closeConnection(conn)
+    }
+  }
+
+  def shutdown() {
+    this.synchronized {
+      working = false
+      freeConnections.foreach(closeConnection)
+      connCounter.set(0)
+    }
+  }
+
+  private def closeConnection(conn: PooledConnection) {
+    try {
+      conn.base.close()
+    } catch {
+      case e: Exception => logger.log(Level.WARNING, "Error closing pool connection", e)
+    }
   }
 
   private def newPoolConnection(): PooledConnection = {

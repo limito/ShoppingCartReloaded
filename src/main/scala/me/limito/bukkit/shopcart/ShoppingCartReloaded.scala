@@ -2,30 +2,35 @@ package me.limito.bukkit.shopcart
 
 import database.{CartItemInfoDao, JdbcDataSource, DatabaseConfig}
 import org.bukkit.plugin.java.JavaPlugin
-import java.sql.DriverManager
 import java.io.File
 import org.bukkit.configuration.file.YamlConfiguration
 import java.util.logging.Level
-import org.bukkit.command.{Command, CommandSender, CommandExecutor}
+import org.bukkit.command.{Command, CommandSender}
 import request._
 import scala.Predef.augmentString
 import org.bukkit.entity.Player
 
 class ShoppingCartReloaded extends JavaPlugin {
+  ShoppingCartReloaded.instance = this
+
   val requestManager: RequestManager = new RequestManager(this)
-  var lang = new Lang
+  var lang: Lang = _
   var dao: CartItemInfoDao = _
+  var dataSource: JdbcDataSource = _
 
   override def onEnable() {
-
+    reload()
     getServer.getPluginCommand("cart").setExecutor(this)
   }
 
   override def onDisable() {
-
+    requestManager.shutdown()
   }
 
   def reload() {
+    if (dataSource != null)
+      dataSource.shutdown()
+
     lang = new Lang()
     dao = null
 
@@ -37,11 +42,7 @@ class ShoppingCartReloaded extends JavaPlugin {
 
   def loadMessages() {
     try {
-      val fileName = "messages.yml"
-
-      saveResource(fileName, false)
-      val file = new File(getDataFolder, fileName)
-      val config = YamlConfiguration.loadConfiguration(file)
+      val config = loadYamlOrDefault("messages.yml")
       lang.read(config)
     } catch {
       case e: Exception => getLogger.log(Level.SEVERE, s"Error loading messages", e)
@@ -50,11 +51,7 @@ class ShoppingCartReloaded extends JavaPlugin {
 
   def loadItemNames() {
     try {
-      val fileName = "items.yml"
-
-      saveResource(fileName, false)
-      val file = new File(getDataFolder, fileName)
-      val config = YamlConfiguration.loadConfiguration(file)
+      val config = loadYamlOrDefault("items.yml")
       lang.readItems(config)
     } catch {
       case e: Exception => getLogger.log(Level.SEVERE, s"Error loading item names", e)
@@ -63,11 +60,7 @@ class ShoppingCartReloaded extends JavaPlugin {
 
   def loadEnchantmentNames() {
     try {
-      val fileName = "enchantments.yml"
-
-      saveResource(fileName, false)
-      val file = new File(getDataFolder, fileName)
-      val config = YamlConfiguration.loadConfiguration(file)
+      val config = loadYamlOrDefault("enchantments.yml")
       lang.readEnchantments(config.getConfigurationSection("enchantments"))
     } catch {
       case e: Exception => getLogger.log(Level.SEVERE, s"Error loading enchantment names", e)
@@ -104,38 +97,47 @@ class ShoppingCartReloaded extends JavaPlugin {
   override def onCommand(sender: CommandSender, command: Command, label: String, args: Array[String]): Boolean = {
     args match {
       case Array("reload") if sender.hasPermission("cart.reload") => reload(); true
-      case Array("get", itemId, itemAmount) => {
-        val req = new RequestItemGive(requestManager, sender, itemId.toInt, itemAmount.toInt)
+      case Array("get", itemId, itemAmount) =>
+        val req = new RequestItemGive(sender, itemId.toInt, itemAmount.toInt)
         requestManager.handleRequest(req)
         true
-      }
-      case Array("get", itemId) => {
-        val req = new RequestItemGive(requestManager, sender, itemId.toInt, Int.MaxValue)
+      case Array("get", itemId) =>
+        val req = new RequestItemGive(sender, itemId.toInt, Int.MaxValue)
         requestManager.handleRequest(req)
         true
-      }
-      case Array("all") => {
-        val req = new RequestGiveAll(requestManager, sender)
+      case Array("all") =>
+        val req = new RequestGiveAll(sender)
         requestManager.handleRequest(req)
         true
-      }
-      case Array("put") => {
-        if (sender.isInstanceOf[Player]) {
-          val stack = sender.asInstanceOf[Player].getItemInHand
-          if (stack != null && stack.getTypeId > 0) {
-            val req = new RequestPutItem(requestManager, sender, sender.getName, stack.clone(), stack.getAmount)
-            requestManager.handleRequest(req)
-            true
-          }
+      case Array("put") if sender.isInstanceOf[Player] =>
+        val stack = sender.asInstanceOf[Player].getItemInHand
+        if (stack != null && stack.getTypeId > 0) {
+          val req = new RequestPutItem(sender, sender.getName, stack.clone(), stack.getAmount)
+          requestManager.handleRequest(req)
         }
-        false
-      }
-      case Array() => {
-        val req = new RequestItemsList(requestManager, sender)
+        true
+      case Array() =>
+        val req = new RequestItemsList(sender)
         requestManager.handleRequest(req)
         true
-      }
       case _ => false
     }
   }
+
+  private def loadYamlOrDefault(resource: String): YamlConfiguration = {
+    val file = copyDefaultIfNeeded(resource)
+    YamlConfiguration.loadConfiguration(file)
+  }
+
+  private def copyDefaultIfNeeded(resource: String): File = {
+    val file = new File(getDataFolder, resource)
+    if (!file.exists()) {
+      saveResource(resource, false)
+    }
+    file
+  }
+}
+
+object ShoppingCartReloaded {
+  var instance: ShoppingCartReloaded = _
 }

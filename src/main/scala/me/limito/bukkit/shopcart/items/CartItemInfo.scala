@@ -9,21 +9,21 @@ class CartItemInfo(var id: java.lang.Long, var itemType: String, var item: Strin
       itemType match {
         case "item" => toMinecraftItem
         case "money" => toMoneyItem
-        case _ => new CartItemUnknown(this)
+        case _ => new CartItemUnknown()
       }
     } catch {
-      case e: Exception => new CartItemUnknown(this)
+      case e: Exception => new CartItemUnknown()
     }
   }
 
-  private def toMoneyItem: CartItemMoney = new CartItemMoney(this, amount)
+  private def toMoneyItem: CartItemMoney = new CartItemMoney(amount)
 
   private def toMinecraftItem: CartItemItem = {
     val Array(main, enchants @ _*) = item.split("#", 2)
     val Array(id, meta @ _*) = main.split(":", 2)
 
     val ench = if(enchants.size > 0) parsePoundEnchantments(enchants(0)) else null
-    new CartItemItem(this, id.toInt, if (meta.isEmpty) 0 else meta.head.toShort, amount, ench, null)
+    new CartItemItem(id.toInt, if (meta.isEmpty) 0 else meta.head.toShort, amount, ench, null)
   }
 
   private def parsePoundEnchantments(str: String): Array[LeveledEnchantment] = str.split("#").map (d => {

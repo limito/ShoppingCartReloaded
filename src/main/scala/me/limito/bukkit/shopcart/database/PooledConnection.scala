@@ -7,7 +7,7 @@ import scala.Predef.String
 import scala.Array
 import java.{util, sql}
 
-class PooledConnection(source: JdbcDataSource, base: Connection) extends Wrapper with AutoCloseable with Connection {
+class PooledConnection(source: JdbcDataSource, val base: Connection) extends Wrapper with AutoCloseable with Connection {
   def unwrap[T](iface: Class[T]): T = {
     base.unwrap(iface)
   }

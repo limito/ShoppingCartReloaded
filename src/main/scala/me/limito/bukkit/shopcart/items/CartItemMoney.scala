@@ -5,7 +5,7 @@ import me.limito.bukkit.shopcart.Lang
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
 
-class CartItemMoney(info: CartItemInfo, amount: Int) extends CartItem(info) {
+class CartItemMoney(amount: Int) extends CartItem {
   override def getYouGetMessage(amount: Int, lang: Lang): String = lang.format("cart-get.get-money", amount)
 
   override def getLocalizedName(lang: Lang): String = lang.format("cart.money", amount)
