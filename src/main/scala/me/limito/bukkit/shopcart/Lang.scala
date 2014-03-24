@@ -43,6 +43,10 @@ class Lang {
   def get(formatName: String) = messageFormats.getOrElse(formatName, formatName)
   def format(formatName: String, data: Any*):String = get(formatName).format(data: _*)
 
+  def getParametrizedMessage(formatName: String, param: Int) = {
+    messageFormats.getOrElse(formatName + "." + param, get(formatName + ".default")).format(param)
+  }
+
   def getItemName(id: Int, meta: Int): String = {
     def addMetaSuffix(str: String, meta: Int) = if (meta > 0) str + ":" + meta else str
 

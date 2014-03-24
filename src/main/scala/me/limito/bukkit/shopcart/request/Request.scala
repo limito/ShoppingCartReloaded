@@ -2,6 +2,7 @@ package me.limito.bukkit.shopcart.request
 
 import org.bukkit.command.CommandSender
 import me.limito.bukkit.shopcart.database.DatabaseScheduler
+import java.util.logging.Level
 
 abstract class Request(val requestManager: RequestManager, val commandSender: CommandSender) {
   /** Игрок не может одновременно запускать несколько вопросов с mustLock=true */
@@ -13,12 +14,14 @@ abstract class Request(val requestManager: RequestManager, val commandSender: Co
   def dao = requestManager.plugin.dao
 
   def withDatabase(f: () => Unit) {
-    DatabaseScheduler.schedule(f)
+    DatabaseScheduler.schedule(() => withExceptionHandling(f()))
   }
 
   def withBukkit(f: () => Unit) {
     requestManager.plugin.getServer.getScheduler.scheduleSyncDelayedTask(requestManager.plugin, new Runnable {
-      def run() {f()}
+      def run() {
+        withExceptionHandling(f())
+      }
     })
   }
 
@@ -42,6 +45,17 @@ abstract class Request(val requestManager: RequestManager, val commandSender: Co
         commandSender.sendMessage(message)
       }
     })
+  }
+
+  def withExceptionHandling[T](f: => T) {
+    try {
+      f
+    } catch {
+      case e: Exception => {
+        sendMessage(lang.get("cart.error"))
+        requestManager.plugin.getLogger.log(Level.SEVERE, "Error completing request " + toString, e)
+      }
+    }
   }
 
   def completed() {
