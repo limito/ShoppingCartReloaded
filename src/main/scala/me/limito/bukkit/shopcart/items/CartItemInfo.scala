@@ -8,12 +8,15 @@ class CartItemInfo(var id: java.lang.Long, var itemType: String, var item: Strin
     try {
       itemType match {
         case "item" => toMinecraftItem
+        case "money" => toMoneyItem
         case _ => new CartItemUnknown(this)
       }
     } catch {
       case e: Exception => new CartItemUnknown(this)
     }
   }
+
+  private def toMoneyItem: CartItemMoney = new CartItemMoney(this, amount)
 
   private def toMinecraftItem: CartItemItem = {
     val Array(main, enchants @ _*) = item.split("#", 2)
