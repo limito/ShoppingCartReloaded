@@ -14,7 +14,7 @@ class RequestItemsList(commandSender: CommandSender) extends Request(commandSend
     val outLines = itemsInfo map (info => {
       val item = info.toItem; lang.format("cart.item", info.id, item.getLocalizedName(lang), info.amount)
     })
-    val countMessage = lang.getParametrizedMessage("cart.n-items", itemsInfo.size)
+    val countMessage = lang.formatSubtype("cart.n-items", itemsInfo.size)
 
     withBukkit(() => {
       commandSender.sendMessage(countMessage)

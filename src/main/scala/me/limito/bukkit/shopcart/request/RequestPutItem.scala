@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack
 import me.limito.bukkit.shopcart.items.CartItemInfo
 import org.bukkit.enchantments.Enchantment
 import collection.JavaConversions._
+import me.limito.bukkit.shopcart.ShoppingCartReloaded
 
 class RequestPutItem(commandSender: CommandSender, owner: String, itemStack: ItemStack, amount: Int) extends Request(commandSender) {
   private var info: CartItemInfo = _
@@ -18,8 +19,7 @@ class RequestPutItem(commandSender: CommandSender, owner: String, itemStack: Ite
 
   def handle() {
     val id = dao.addItem(info)
-
-    sendMessage(s"Item added (id: $id)")
+    sendMessage(ShoppingCartReloaded.instance.lang.format("cart-put.put", id))
   }
 
   private def createInfo(itemStack: ItemStack):CartItemInfo = {

@@ -30,7 +30,9 @@ class RequestGiveAll(commandSender: CommandSender) extends Request(commandSender
         val item = info.toItem
         val given = giveItem(item)
         info.amount -= given
-        updatedItemsBuffer += new ItemGiveInfo(info, item, given)
+
+        if (given > 0)
+          updatedItemsBuffer += new ItemGiveInfo(info, item, given)
       })
     })
 

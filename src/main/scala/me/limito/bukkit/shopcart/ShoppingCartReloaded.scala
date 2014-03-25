@@ -9,6 +9,7 @@ import org.bukkit.command.{Command, CommandSender}
 import request._
 import scala.Predef.augmentString
 import org.bukkit.entity.Player
+import collection.JavaConversions._
 
 class ShoppingCartReloaded extends JavaPlugin {
   ShoppingCartReloaded.instance = this
@@ -42,7 +43,7 @@ class ShoppingCartReloaded extends JavaPlugin {
 
   def loadMessages() {
     try {
-      val config = loadYamlOrDefault("messages.yml")
+      val config = loadYamlAndMerge("messages.yml")
       lang.read(config)
     } catch {
       case e: Exception => getLogger.log(Level.SEVERE, s"Error loading messages", e)
@@ -51,7 +52,7 @@ class ShoppingCartReloaded extends JavaPlugin {
 
   def loadItemNames() {
     try {
-      val config = loadYamlOrDefault("items.yml")
+      val config = loadYamlAndMerge("items.yml")
       lang.readItems(config)
     } catch {
       case e: Exception => getLogger.log(Level.SEVERE, s"Error loading item names", e)
@@ -60,7 +61,7 @@ class ShoppingCartReloaded extends JavaPlugin {
 
   def loadEnchantmentNames() {
     try {
-      val config = loadYamlOrDefault("enchantments.yml")
+      val config = loadYamlAndMerge("enchantments.yml")
       lang.readEnchantments(config.getConfigurationSection("enchantments"))
     } catch {
       case e: Exception => getLogger.log(Level.SEVERE, s"Error loading enchantment names", e)
@@ -96,37 +97,48 @@ class ShoppingCartReloaded extends JavaPlugin {
 
   override def onCommand(sender: CommandSender, command: Command, label: String, args: Array[String]): Boolean = {
     args match {
-      case Array("reload") if sender.hasPermission("cart.reload") => reload(); true
+      case Array("reload") if sender.hasPermission("cart.reload") => reload()
       case Array("get", itemId, itemAmount) =>
         val req = new RequestItemGive(sender, itemId.toInt, itemAmount.toInt)
         requestManager.handleRequest(req)
-        true
       case Array("get", itemId) =>
         val req = new RequestItemGive(sender, itemId.toInt, Int.MaxValue)
         requestManager.handleRequest(req)
-        true
       case Array("all") =>
         val req = new RequestGiveAll(sender)
         requestManager.handleRequest(req)
-        true
       case Array("put") if sender.isInstanceOf[Player] =>
         val stack = sender.asInstanceOf[Player].getItemInHand
         if (stack != null && stack.getTypeId > 0) {
           val req = new RequestPutItem(sender, sender.getName, stack.clone(), stack.getAmount)
           requestManager.handleRequest(req)
         }
-        true
       case Array() =>
         val req = new RequestItemsList(sender)
         requestManager.handleRequest(req)
-        true
-      case _ => false
+      case _ => return false
     }
+    true
   }
 
   private def loadYamlOrDefault(resource: String): YamlConfiguration = {
     val file = copyDefaultIfNeeded(resource)
     YamlConfiguration.loadConfiguration(file)
+  }
+
+  private def loadYamlAndMerge(resource: String): YamlConfiguration = {
+    val config = loadYamlOrDefault(resource)
+    val defaultConfig = YamlConfiguration.loadConfiguration(getClass.getResourceAsStream("/" + resource))
+    var somethingMerged = false
+
+    for (key <- defaultConfig.getKeys(true))
+      if (!config.contains(key)) {
+        config.set(key, defaultConfig.get(key))
+        somethingMerged = true
+      }
+    if (somethingMerged)
+      config.save(new File(getDataFolder, resource))
+    config
   }
 
   private def copyDefaultIfNeeded(resource: String): File = {

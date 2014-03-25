@@ -1,7 +1,7 @@
 package me.limito.bukkit.shopcart.items
 
 import org.bukkit.entity.Player
-import me.limito.bukkit.shopcart.Lang
+import me.limito.bukkit.shopcart.{ShoppingCartReloaded, Lang}
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
 
@@ -17,6 +17,8 @@ class CartItemMoney(amount: Int) extends CartItem {
       val response = econ.depositPlayer(player.getName, amount)
       if (response.transactionSuccess())
         return amount
+    } else {
+      player.sendMessage(ShoppingCartReloaded.instance.lang.get("cart-get.no-money"))
     }
     0
   }
