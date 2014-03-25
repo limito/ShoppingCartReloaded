@@ -25,11 +25,10 @@ class Lang {
       val item = key.split("\\.")
       item match {
         case Array(itemId) => itemsNames(itemId.toInt) = value
-        case Array(itemId, itemMeta) => {
+        case Array(itemId, itemMeta) =>
           if (itemsMetaNames(itemId.toInt) == null)
             itemsMetaNames(itemId.toInt) = new Array[String](Short.MaxValue + 1)
           itemsMetaNames(itemId.toInt)(itemMeta.toInt) = value
-        }
       }
     }
   }
@@ -43,9 +42,11 @@ class Lang {
   def get(formatName: String) = messageFormats.getOrElse(formatName, formatName)
   def format(formatName: String, data: Any*):String = get(formatName).format(data: _*)
 
-  def getParametrizedMessage(formatName: String, param: Int) = {
+  def formatSubtype(formatName: String, param: String) = {
     messageFormats.getOrElse(formatName + "." + param, get(formatName + ".default")).format(param)
   }
+
+  def formatSubtype(formatName: String, param: Int): String = formatSubtype(formatName, param.toString)
 
   def getItemName(id: Int, meta: Int): String = {
     def addMetaSuffix(str: String, meta: Int) = if (meta > 0) str + ":" + meta else str
