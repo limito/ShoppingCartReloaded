@@ -26,7 +26,11 @@ class RequestPutItem(commandSender: CommandSender, owner: String, itemStack: Ite
     val enchInfo = if(itemStack.getEnchantments.isEmpty) "" else "#" + createEnchantmentsInfo(itemStack.getEnchantments)
     val itemName = if(itemStack.getDurability == 0) itemStack.getTypeId.toString else itemStack.getTypeId.toString + ":" + itemStack.getDurability.toString
 
-    new CartItemInfo(null, "item", itemName + enchInfo, owner, amount, null)
+    val nbtHelper = ShoppingCartReloaded.instance.nbtHelper
+    val tag = nbtHelper.getTag(itemStack)
+    val encodedTag =nbtHelper.encodeJson(tag)
+
+    new CartItemInfo(null, "item", itemName + enchInfo, owner, amount, encodedTag)
   }
 
   private def createEnchantmentsInfo(enchs: java.util.Map[Enchantment, Integer]):String = (for ((id, level) <- enchs) yield id.getId + ":" + level).mkString("#")

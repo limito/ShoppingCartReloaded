@@ -2,18 +2,22 @@ package me.limito.bukkit.shopcart.items
 
 import org.bukkit.entity.Player
 import org.bukkit.inventory.{Inventory, ItemStack}
-import me.limito.bukkit.shopcart.Lang
+import me.limito.bukkit.shopcart.{ShoppingCartReloaded, Lang}
 import org.bukkit.enchantments.Enchantment
+import me.limito.bukkit.shopcart.optional.nbt.NBTTag
+import scala.annotation.tailrec
 
-class CartItemItem(val itemId: Int, val itemMeta: Short, val amount: Int, val enchantments: Array[LeveledEnchantment], val nbtData: String) extends CartItem {
+class CartItemItem(val itemId: Int, val itemMeta: Short, val amount: Int, val enchantments: Array[LeveledEnchantment], val nbtTag: NBTTag) extends CartItem {
   def giveToPlayer(player: Player):Int = giveToPlayer(player, amount)
 
   def giveToPlayer(player: Player, amount: Int):Int = {
-    val stack = new ItemStack(itemId, 1, itemMeta)
+    val bstack = new ItemStack(itemId, 1, itemMeta)
+    val stack = if (nbtTag != null) ShoppingCartReloaded.instance.nbtHelper.placeTag(nbtTag, bstack) else bstack
+
     if (enchantments != null)
       enchantments foreach(e => stack.addUnsafeEnchantment(Enchantment.getById(e.id), e.level))
 
-    give(player.getInventory, stack, amount)
+    give(player.getInventory, stack, amount, 0)
   }
 
   def getLocalizedName(lang: Lang): String = {
@@ -26,10 +30,11 @@ class CartItemItem(val itemId: Int, val itemMeta: Short, val amount: Int, val en
 
   def getYouGetMessage(amount: Int, lang: Lang): String = lang.format("cart-get.get", getLocalizedName(lang), amount)
 
-  private def give(inv: Inventory, baseStack: ItemStack, amount: Int): Int = {
+  @tailrec
+  private def give(inv: Inventory, baseStack: ItemStack, amount: Int, alreadyGiven: Int): Int = {
     require(amount >= 0)
     if (amount == 0)
-      return 0
+      return alreadyGiven
 
     val maxStackSize = Math.max(baseStack.getMaxStackSize, 1)
     val amountToGive = Math.min(maxStackSize, amount)
@@ -38,8 +43,8 @@ class CartItemItem(val itemId: Int, val itemMeta: Short, val amount: Int, val en
     val notGiven = inv.addItem(stack)
 
     if (notGiven.isEmpty)
-      amountToGive + give(inv, baseStack, amount - amountToGive)
+      give(inv, baseStack, amount - amountToGive, amountToGive + alreadyGiven)
     else
-      amountToGive - notGiven.values().iterator().next().getAmount
+      alreadyGiven + amountToGive - notGiven.values().iterator().next().getAmount
   }
 }

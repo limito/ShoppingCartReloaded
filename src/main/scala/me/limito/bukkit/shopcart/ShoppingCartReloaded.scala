@@ -10,6 +10,7 @@ import request._
 import scala.Predef.augmentString
 import org.bukkit.entity.Player
 import collection.JavaConversions._
+import me.limito.bukkit.shopcart.optional.nbt.{PowerNBTHelper, NBTHelperStub, NBTHelper}
 
 class ShoppingCartReloaded extends JavaPlugin {
   ShoppingCartReloaded.instance = this
@@ -18,6 +19,8 @@ class ShoppingCartReloaded extends JavaPlugin {
   var lang: Lang = _
   var dao: CartItemInfoDao = _
   var dataSource: JdbcDataSource = _
+
+  var nbtHelper: NBTHelper = _
 
   override def onEnable() {
     reload()
@@ -39,6 +42,7 @@ class ShoppingCartReloaded extends JavaPlugin {
     loadItemNames()
     loadEnchantmentNames()
     initDatabase()
+    initNbt()
   }
 
   def loadMessages() {
@@ -73,6 +77,18 @@ class ShoppingCartReloaded extends JavaPlugin {
 
     val dataSource = new JdbcDataSource(dbConfig.url, dbConfig.username,  dbConfig.password, 4)
     dao = new CartItemInfoDao(dataSource, dbConfig)
+  }
+
+  def initNbt() {
+    try {
+      Class.forName("me.dpohvar.powernbt.nbt.NBTBase")
+      nbtHelper = new PowerNBTHelper
+      getLogger.info("Detected PowerNBT")
+    } catch {
+      case _: ClassNotFoundException =>
+        getLogger.info("PowerNBT not detected")
+        nbtHelper = new NBTHelperStub
+    }
   }
 
   def loadDatabaseConfig(): DatabaseConfig = {
