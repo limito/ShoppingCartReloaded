@@ -7,7 +7,7 @@ import me.limito.bukkit.shopcart.ShoppingCartReloaded
 import java.util.logging.Level
 import collection.JavaConversions._
 
-class JdbcDataSource(val url: String, val username: String, val password: String, val poolSize: Int) {
+class JdbcDataSource(val config: ConnectionConfig) {
   private val freeConnections = new LinkedBlockingQueue[PooledConnection]()
   private val connCounter = new AtomicInteger()
   private val logger = ShoppingCartReloaded.instance.getLogger
@@ -26,7 +26,7 @@ class JdbcDataSource(val url: String, val username: String, val password: String
         connCounter.decrementAndGet()
       }
 
-      if (connection == null && connCounter.get() < poolSize)
+      if (connection == null && connCounter.get() < config.connections)
         connection = newPoolConnection()
     }
     connection
@@ -63,6 +63,6 @@ class JdbcDataSource(val url: String, val username: String, val password: String
     conn
   }
 
-  private def newConnection() = DriverManager.getConnection(url, username,  password)
+  private def newConnection() = DriverManager.getConnection(config.url, config.username,  config.password)
   private def checkConnection(conn: PooledConnection) = conn.isValid(0)
 }

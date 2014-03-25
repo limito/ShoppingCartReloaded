@@ -3,10 +3,18 @@ db:
   username: shopcart
   password: shopcart
   table: shopcart
+  connections: 2   # Максимальное количество одновременных подключений
   column:
     id: id
-    player: player
     type: type
     item: item
+    player: player
     amount: amount
     extra: extra
+    server: server
+
+  multiserver:
+    enabled: false
+
+    # То, что написано в колонке server
+    server: 1

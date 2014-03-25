@@ -4,13 +4,42 @@ import java.sql.{Statement, PreparedStatement, ResultSet, Connection}
 import me.limito.bukkit.shopcart.items.CartItemInfo
 
 class CartItemInfoDao(dataSource: JdbcDataSource, config: DatabaseConfig) {
-  private val columnNames = s"`${config.columnId}`,`${config.columnType}`,`${config.columnItem}`,`${config.columnOwner}`,`${config.columnAmount}`,`${config.columnExtra}`"
+  private val columns = config.columns
+  private val columnId = columns("id")
+  private val columnType = columns("type")
+  private val columnItem = columns("item")
+  private val columnPlayer = columns("player")
+  private val columnAmount = columns("amount")
+  private val columnExtra = columns("extra")
+  private val columnServer = columns("server")
+  private val table = config.table
 
-  private val insertStatement = s"INSERT INTO `${config.table}`($columnNames) VALUES (DEFAULT, ?, ?, ?, ?, ?)"
-  private val selectAllStatement = s"SELECT $columnNames FROM ${config.table} WHERE `${config.columnOwner}`= ?"
-  private val selectStatementById = s"SELECT $columnNames FROM ${config.table} WHERE `${config.columnId}`= ?"
-  private val updateAmountStatement = s"UPDATE `${config.table}` SET `${config.columnAmount}`=? WHERE `${config.columnId}`= ?"
-  private val deleteItemStatement = s"DELETE FROM `${config.table}` WHERE `${config.columnId}`=?"
+  private val columnNames = s"$columnId,$columnType,$columnItem,$columnPlayer,$columnAmount,$columnExtra"
+
+  private var insertStatement: String = _
+  private var selectAllStatement: String = _
+  private var selectStatementById: String = _
+  private var updateAmountStatement: String = _
+  private var deleteItemStatement: String = _
+
+  setupStatements()
+  def setupStatements() {
+    val server = config.serverName.getOrElse(null)
+
+    if (server == null) {
+      insertStatement = s"INSERT INTO $table($columnNames) VALUES (DEFAULT, ?, ?, ?, ?, ?)"
+      selectAllStatement = s"SELECT $columnNames FROM $table WHERE $columnPlayer = ?"
+      selectStatementById = s"SELECT $columnNames FROM $table WHERE $columnId = ?"
+      updateAmountStatement = s"UPDATE $table SET $columnAmount = ? WHERE $columnId = ?"
+      deleteItemStatement = s"DELETE FROM $table WHERE $columnId = ?"
+    } else {
+      insertStatement = s"INSERT INTO $table($columnNames, $columnServer) VALUES (DEFAULT, ?, ?, ?, ?, ?, '$server')"
+      selectAllStatement = s"SELECT $columnNames FROM $table WHERE $columnPlayer = ? AND $columnServer = '$server'"
+      selectStatementById = s"SELECT $columnNames FROM $table WHERE $columnId = ? AND $columnServer = '$server'"
+      updateAmountStatement = s"UPDATE $table SET $columnAmount = ? WHERE $columnId = ?"
+      deleteItemStatement = s"DELETE FROM $table WHERE $columnId = ?"
+    }
+  }
 
   def addItem(info: CartItemInfo): Long = {
     withConnection(
@@ -105,12 +134,12 @@ class CartItemInfoDao(dataSource: JdbcDataSource, config: DatabaseConfig) {
   private def parseResultSet(rs: ResultSet, list: List[CartItemInfo]): List[CartItemInfo] = if (rs.next()) parseInfo(rs) :: parseResultSet(rs, list) else list
 
   private def parseInfo(rs: ResultSet):CartItemInfo = {
-    val id = rs.getInt(config.columnId)
-    val itemType = rs.getString(config.columnType)
-    val item = rs.getString(config.columnItem)
-    val owner = rs.getString(config.columnOwner)
-    val amount = rs.getInt(config.columnAmount)
-    val extra = rs.getString(config.columnExtra)
-    new CartItemInfo(id, itemType, item, owner, amount, extra)
+    val id = rs.getInt(columnId)
+    val itemType = rs.getString(columnType)
+    val item = rs.getString(columnItem)
+    val player = rs.getString(columnPlayer)
+    val amount = rs.getInt(columnAmount)
+    val extra = rs.getString(columnExtra)
+    new CartItemInfo(id, itemType, item, player, amount, extra)
   }
 }
