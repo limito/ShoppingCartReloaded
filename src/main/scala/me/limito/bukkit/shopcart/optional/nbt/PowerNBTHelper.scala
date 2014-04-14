@@ -25,7 +25,8 @@ class PowerNBTHelper extends NBTHelper {
 
     val wrappedStack = wrapToCraftStack(stack)
     val container = new NBTContainerItem(wrappedStack)
-    container.setTag(if (tag != null) tagi.nbt else null)
+    val nbt = if (tag != null) tagi.nbt else null
+    container.setTag(nbt)
 
     wrappedStack
   }
