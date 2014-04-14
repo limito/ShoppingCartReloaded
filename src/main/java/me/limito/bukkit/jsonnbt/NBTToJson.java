@@ -12,7 +12,7 @@ public class NBTToJson {
         return builder.toString();
     }
 
-    private static void encodeNamed(NBTBase base, StringBuilder b) {
+    private static void encodeNamed(NBTBase base, String name, StringBuilder b) {
         b.append(base.getName());
         b.append(": ");
         encode(base, b);
@@ -50,12 +50,13 @@ public class NBTToJson {
 
         if (tag.size() > 0) {
             Iterator<String> iterator = keys.iterator();
-            encodeNamed(tag.get(iterator.next()), b);
+            String firstKey = iterator.next();
+            encodeNamed(tag.get(firstKey), firstKey, b);
             while (iterator.hasNext()) {
                 b.append(", ");
 
                 String key = iterator.next();
-                encodeNamed(tag.get(key), b);
+                encodeNamed(tag.get(key), key, b);
             }
         }
         b.append('}');
