@@ -13,7 +13,7 @@ public class NBTToJson {
     }
 
     private static void encodeNamed(NBTBase base, String name, StringBuilder b) {
-        b.append(base.getName());
+        b.append(name);
         b.append(": ");
         encode(base, b);
     }

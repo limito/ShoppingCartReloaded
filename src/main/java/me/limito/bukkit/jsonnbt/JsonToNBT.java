@@ -410,7 +410,7 @@ public class JsonToNBT
             while (iterator.hasNext())
             {
                 JsonToNBT.Any any = (JsonToNBT.Any)iterator.next();
-                nbttagcompound.set(any.field_150490_a, any.func_150489_a());
+                nbttagcompound.put(any.field_150490_a, any.func_150489_a());
             }
 
             return nbttagcompound;
