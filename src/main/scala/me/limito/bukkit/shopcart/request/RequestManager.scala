@@ -22,7 +22,6 @@ class RequestManager(val plugin: ShoppingCartReloaded) {
             withExceptionHandling(request) {
               request.handle()
             }
-            onCompleted(request)
           }
         })
       }
@@ -41,6 +40,8 @@ class RequestManager(val plugin: ShoppingCartReloaded) {
       case e: Throwable =>
         request.sendMessage(lang.get("cart.error"))
         plugin.getLogger.log(Level.SEVERE, "Error completing request " + toString, e)
+    } finally {
+      onCompleted(request)
     }
   }
 
