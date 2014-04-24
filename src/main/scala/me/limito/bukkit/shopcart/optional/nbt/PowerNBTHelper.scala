@@ -3,15 +3,29 @@ package me.limito.bukkit.shopcart.optional.nbt
 import me.dpohvar.powernbt.nbt.{NBTContainerItem, NBTBase}
 import org.bukkit.inventory.{Inventory, ItemStack}
 import me.limito.bukkit.shopcart.ShoppingCartReloaded
-import me.limito.bukkit.jsonnbt.JsonToNBT
-import me.limito.bukkit.jsonnbt.NBTToJson
+import me.limito.bukkit.jsonnbt.{Test, JsonToNBT, NBTToJson}
+import java.util.logging.Level
 
 class PowerNBTHelper extends NBTHelper {
+  runTests()
+
   /* PowerNBT работает только на CraftItemStack, этот метод служит для конвертации ItemStack в CraftItemStack*/
   def wrapToCraftStack(stack: ItemStack): ItemStack = {
     val inv: Inventory = ShoppingCartReloaded.instance.getServer.createInventory(null, 9)
     inv.addItem(stack)
     inv.getItem(0)
+  }
+
+  def runTests() {
+    val logger = ShoppingCartReloaded.instance.getLogger
+    logger.info("Testing PowerNBT...")
+    try {
+      val test = new Test()
+      test.run()
+      logger.info("Tests passed")
+    } catch {
+      case e: Throwable => logger.log(Level.WARNING, "*** PowerNBT tests failed! ***", e)
+    }
   }
 
   @throws[NBTParseException]
