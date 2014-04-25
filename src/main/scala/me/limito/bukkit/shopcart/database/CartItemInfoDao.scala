@@ -51,12 +51,15 @@ class CartItemInfoDao(connSource: JdbcConnectionSource, config: DatabaseConfig) 
   def getItemInfoById(id: Long): Option[CartItemInfo] = withExceptionHandling {
     val queryBuilder = dao.queryBuilder()
     if (config.serverName.isDefined) {
-      queryBuilder.where().eq(config.columns("server"), new SelectArg(config.serverName.get))
+      queryBuilder.where().
+        eq(config.columns("server"), new SelectArg(config.serverName.get)).
+        and().
+        eq(config.columns("id"), new SelectArg(id))
     }
     dao.query(queryBuilder.prepare()).asScala.headOption
   }
 
   def updateItems(items: List[CartItemInfo]) = withExceptionHandling {
-    items.foreach(dao.update)
+    items.foreach(item => if (item.amount > 0) dao.update(item) else dao.delete(item))
   }
 }
