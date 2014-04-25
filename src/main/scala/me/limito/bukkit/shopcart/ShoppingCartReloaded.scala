@@ -1,20 +1,20 @@
 package me.limito.bukkit.shopcart
 
-import me.limito.bukkit.shopcart.database.{ConnectionConfig, CartItemInfoDao, JdbcDataSource, DatabaseConfig}
+import me.limito.bukkit.shopcart.database.{ConnectionConfig, CartItemInfoDao, DatabaseConfig}
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import org.bukkit.configuration.file.YamlConfiguration
 import java.util.logging.Level
-import org.bukkit.command.{Command, CommandSender}
+import org.bukkit.command.{CommandExecutor, Command, CommandSender}
 import request._
 import scala.Predef.augmentString
 import org.bukkit.entity.Player
 import collection.JavaConversions._
 import me.limito.bukkit.shopcart.optional.nbt.{PowerNBTHelper, NBTHelperStub, NBTHelper}
 import com.j256.ormlite.jdbc.JdbcConnectionSource
-import com.j256.ormlite.logger.{LocalLog, Logger}
+import com.j256.ormlite.logger.LocalLog
 
-class ShoppingCartReloaded extends JavaPlugin {
+class ShoppingCartReloaded(val plugin: JavaPlugin) extends CommandExecutor {
   ShoppingCartReloaded.instance = this
 
   val requestManager: RequestManager = new RequestManager(this)
@@ -24,12 +24,12 @@ class ShoppingCartReloaded extends JavaPlugin {
 
   var nbtHelper: NBTHelper = _
 
-  override def onEnable() {
+  def onEnable() {
     reload()
-    getServer.getPluginCommand("cart").setExecutor(this)
+    plugin.getServer.getPluginCommand("cart").setExecutor(this)
   }
 
-  override def onDisable() {
+  def onDisable() {
     requestManager.shutdown()
   }
 
@@ -46,6 +46,9 @@ class ShoppingCartReloaded extends JavaPlugin {
     initDatabase()
     initNbt()
   }
+
+  def getLogger = plugin.getLogger
+  def getServer = plugin.getServer
 
   def loadMessages() {
     try {
@@ -75,10 +78,10 @@ class ShoppingCartReloaded extends JavaPlugin {
   }
 
   def initDatabase() {
-    saveDefaultConfig()
-    val section = getConfig.getConfigurationSection("db")
+    plugin.saveDefaultConfig()
+    val section = plugin.getConfig.getConfigurationSection("db")
 
-    val ormliteLogFile = new File(getDataFolder, "ormlite.log")
+    val ormliteLogFile = new File(plugin.getDataFolder, "ormlite.log")
     LocalLog.openLogFile(ormliteLogFile.getAbsolutePath)
 
     val connConfig = ConnectionConfig.fromYaml(section)
@@ -142,14 +145,14 @@ class ShoppingCartReloaded extends JavaPlugin {
         somethingMerged = true
       }
     if (somethingMerged)
-      config.save(new File(getDataFolder, resource))
+      config.save(new File(plugin.getDataFolder, resource))
     config
   }
 
   private def copyDefaultIfNeeded(resource: String): File = {
-    val file = new File(getDataFolder, resource)
+    val file = new File(plugin.getDataFolder, resource)
     if (!file.exists()) {
-      saveResource(resource, false)
+      plugin.saveResource(resource, false)
     }
     file
   }

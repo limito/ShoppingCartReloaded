@@ -21,7 +21,7 @@ abstract class Request(val commandSender: CommandSender) {
   def withBukkit(f: () => Unit) = {
     var throwable: Throwable = null
     val latch = new CountDownLatch(1)
-    ShoppingCartReloaded.instance.getServer.getScheduler.scheduleSyncDelayedTask(ShoppingCartReloaded.instance, new Runnable {
+    ShoppingCartReloaded.instance.getServer.getScheduler.scheduleSyncDelayedTask(ShoppingCartReloaded.instance.plugin, new Runnable {
       def run() {
         try {
           f()
@@ -45,7 +45,7 @@ abstract class Request(val commandSender: CommandSender) {
       commandSender.sendMessage(messages.toArray)
     } else {
       val array = messages.toArray
-      ShoppingCartReloaded.instance.getServer.getScheduler.scheduleSyncDelayedTask(ShoppingCartReloaded.instance, new Runnable {
+      ShoppingCartReloaded.instance.getServer.getScheduler.scheduleSyncDelayedTask(ShoppingCartReloaded.instance.plugin, new Runnable {
         def run() {
           commandSender.sendMessage(array)
         }
@@ -57,7 +57,7 @@ abstract class Request(val commandSender: CommandSender) {
     if (ShoppingCartReloaded.instance.getServer.isPrimaryThread) {
       commandSender.sendMessage(message)
     } else {
-      ShoppingCartReloaded.instance.getServer.getScheduler.scheduleSyncDelayedTask(ShoppingCartReloaded.instance, new Runnable {
+      ShoppingCartReloaded.instance.getServer.getScheduler.scheduleSyncDelayedTask(ShoppingCartReloaded.instance.plugin, new Runnable {
         def run() {
           commandSender.sendMessage(message)
         }
