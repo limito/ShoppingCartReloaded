@@ -3,10 +3,26 @@ package me.limito.bukkit.shopcart.items
 import me.limito.bukkit.shopcart.ShoppingCartReloaded
 import java.util.logging.Level
 import me.limito.bukkit.shopcart.optional.nbt.NBTTag
+import com.j256.ormlite.table.DatabaseTable
+import com.j256.ormlite.field.DatabaseField
+import scala.annotation.target.field
+import me.limito.bukkit.shopcart.items.CartItemInfo.DatabaseFieldQ
 
+object CartItemInfo {
+  type DatabaseFieldQ = DatabaseField @field
+}
 
-class CartItemInfo(var id: java.lang.Long, var itemType: String, var item: String, var owner: String, var amount: Int, var extra: String) {
-  override def toString = id + ": " + item
+@DatabaseTable(tableName = "shopcart")
+class CartItemInfo(@DatabaseFieldQ(generatedId = true, allowGeneratedIdInsert = true) var id: Long,
+                   var itemType: String,
+                   var item: String,
+                   var owner: String,
+                   var amount: Int,
+                   var extra: String,
+                   var server: String = null) {
+  def this() = this(0, null, null, null, 0, null)
+
+  override def toString = String.valueOf(id) + ": " + item
 
   def toItem: CartItem = {
     try {

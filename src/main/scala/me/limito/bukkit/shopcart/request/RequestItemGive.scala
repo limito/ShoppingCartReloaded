@@ -34,7 +34,7 @@ class RequestItemGive(commandSender: CommandSender, itemId: Int, itemAmount: Int
 
         if (amountGiven > 0) {
           info.amount -= amountGiven
-          dao.updateItemsAmount(info :: Nil)
+          dao.updateItems(info :: Nil)
 
           sendMessage(item.getYouGetMessage(amountGiven, lang))
         } else {

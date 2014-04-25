@@ -30,7 +30,7 @@ class RequestPutItem(commandSender: CommandSender, owner: String, itemStack: Ite
     val tag = nbtHelper.getTag(itemStack)
     val encodedTag =nbtHelper.encodeJson(tag)
 
-    new CartItemInfo(null, "item", itemName + enchInfo, owner, amount, encodedTag)
+    new CartItemInfo(0, "item", itemName + enchInfo, owner, amount, encodedTag)
   }
 
   private def createEnchantmentsInfo(enchs: java.util.Map[Enchantment, Integer]):String = (for ((id, level) <- enchs) yield id.getId + ":" + level).mkString("#")

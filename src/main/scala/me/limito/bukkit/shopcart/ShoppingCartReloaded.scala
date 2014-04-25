@@ -11,6 +11,8 @@ import scala.Predef.augmentString
 import org.bukkit.entity.Player
 import collection.JavaConversions._
 import me.limito.bukkit.shopcart.optional.nbt.{PowerNBTHelper, NBTHelperStub, NBTHelper}
+import com.j256.ormlite.jdbc.JdbcConnectionSource
+import com.j256.ormlite.logger.{LocalLog, Logger}
 
 class ShoppingCartReloaded extends JavaPlugin {
   ShoppingCartReloaded.instance = this
@@ -18,7 +20,7 @@ class ShoppingCartReloaded extends JavaPlugin {
   val requestManager: RequestManager = new RequestManager(this)
   var lang: Lang = _
   var dao: CartItemInfoDao = _
-  var dataSource: JdbcDataSource = _
+  var connectionSource: JdbcConnectionSource = _
 
   var nbtHelper: NBTHelper = _
 
@@ -32,8 +34,8 @@ class ShoppingCartReloaded extends JavaPlugin {
   }
 
   def reload() {
-    if (dataSource != null)
-      dataSource.shutdown()
+    if (connectionSource != null)
+      connectionSource.closeQuietly()
 
     lang = new Lang()
     dao = null
@@ -76,11 +78,14 @@ class ShoppingCartReloaded extends JavaPlugin {
     saveDefaultConfig()
     val section = getConfig.getConfigurationSection("db")
 
+    val ormliteLogFile = new File(getDataFolder, "ormlite.log")
+    LocalLog.openLogFile(ormliteLogFile.getAbsolutePath)
+
     val connConfig = ConnectionConfig.fromYaml(section)
     val dbConfig = DatabaseConfig.fromYaml(section)
 
-    val dataSource = new JdbcDataSource(connConfig)
-    dao = new CartItemInfoDao(dataSource, dbConfig)
+    connectionSource = new JdbcConnectionSource(connConfig.url, connConfig.username, connConfig.password)
+    dao = new CartItemInfoDao(connectionSource, dbConfig)
   }
 
   def initNbt() {

@@ -10,7 +10,7 @@ class RequestItemsList(commandSender: CommandSender) extends Request(commandSend
 
   def handle() {
     val playerName = commandSender.getName
-    val itemsInfo = ShoppingCartReloaded.instance.dao.getItemInfos(playerName, 0)
+    val itemsInfo = ShoppingCartReloaded.instance.dao.getItemInfos(playerName)
     val outLines = itemsInfo map (info => {
       val item = info.toItem; lang.format("cart.item", info.id, item.getLocalizedName(lang), info.amount)
     })

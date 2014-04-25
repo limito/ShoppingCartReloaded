@@ -21,7 +21,7 @@ class RequestGiveAll(commandSender: CommandSender) extends Request(commandSender
 
   def handle() {
     val playerName = commandSender.getName
-    val itemInfos = dao.getItemInfos(playerName, 0)
+    val itemInfos = dao.getItemInfos(playerName)
 
     val updatedItemsBuffer = new ListBuffer[ItemGiveInfo]
 
@@ -38,7 +38,7 @@ class RequestGiveAll(commandSender: CommandSender) extends Request(commandSender
 
     val updatedItems = updatedItemsBuffer.toList
 
-    dao.updateItemsAmount(updatedItemsBuffer.map(_.info).toList)
+    dao.updateItems(updatedItemsBuffer.map(_.info).toList)
 
     if (!updatedItems.isEmpty)
       sendMessages(updatedItems.map(update => update.item.getYouGetMessage(update.amount, lang)))
