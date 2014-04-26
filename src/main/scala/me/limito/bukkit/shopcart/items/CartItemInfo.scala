@@ -3,17 +3,8 @@ package me.limito.bukkit.shopcart.items
 import me.limito.bukkit.shopcart.ShoppingCartReloaded
 import java.util.logging.Level
 import me.limito.bukkit.shopcart.optional.nbt.NBTTag
-import com.j256.ormlite.table.DatabaseTable
-import com.j256.ormlite.field.DatabaseField
-import scala.annotation.target.field
-import me.limito.bukkit.shopcart.items.CartItemInfo.DatabaseFieldQ
 
-object CartItemInfo {
-  type DatabaseFieldQ = DatabaseField @field
-}
-
-@DatabaseTable(tableName = "shopcart")
-class CartItemInfo(@DatabaseFieldQ(generatedId = true, allowGeneratedIdInsert = true) var id: Long,
+class CartItemInfo(var id: Long,
                    var itemType: String,
                    var item: String,
                    var owner: String,
@@ -29,6 +20,8 @@ class CartItemInfo(@DatabaseFieldQ(generatedId = true, allowGeneratedIdInsert = 
       itemType match {
         case "item" => toMinecraftItem
         case "money" => toMoneyItem
+        case "rgown" => toWGRegion(WGOwner)
+        case "rgmem" => toWGRegion(WGMember)
         case _ => new CartItemUnknown()
       }
     } catch {
@@ -38,6 +31,7 @@ class CartItemInfo(@DatabaseFieldQ(generatedId = true, allowGeneratedIdInsert = 
     }
   }
 
+  private def toWGRegion(membershipType: WGMembershipType) = new CartItemWG(item, membershipType, amount)
   private def toMoneyItem: CartItemMoney = new CartItemMoney(amount)
 
   private def toMinecraftItem: CartItemItem = {
