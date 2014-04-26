@@ -15,7 +15,7 @@ class CartItemInfoDao(connSource: JdbcConnectionSource, config: DatabaseConfig) 
     val columns = config.columns
     val fieldsList = List(
       idConfig("id", columns("id")),
-      fieldConfig("itemType", columns("type"), nullable = false),
+      fieldConfig("itemType", columns("type"), "item"),
       fieldConfig("item", columns("item"), nullable = false),
       fieldConfig("owner", columns("player"), nullable = false),
       fieldConfig("amount", columns("amount"), nullable = false),

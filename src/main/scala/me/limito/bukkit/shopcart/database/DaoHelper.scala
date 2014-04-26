@@ -10,6 +10,14 @@ trait DaoHelper {
     cfg
   }
 
+  def fieldConfig(fieldName: String, columnName: String, defaultValue: String): DatabaseFieldConfig = {
+    val cfg = new DatabaseFieldConfig(fieldName)
+    cfg.setColumnName(columnName)
+    cfg.setCanBeNull(false)
+    cfg.setDefaultValue(defaultValue)
+    cfg
+  }
+
   def idConfig(fieldName: String, columnName: String): DatabaseFieldConfig = {
     val cfg = new DatabaseFieldConfig(fieldName)
     cfg.setColumnName(columnName)
