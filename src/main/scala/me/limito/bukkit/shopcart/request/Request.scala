@@ -16,6 +16,8 @@ abstract class Request(val commandSender: CommandSender) {
   /** Здесь идет проверка условий для выполнения запроса (например, проверка наличия пермов) **/
   def prehandle() {}
 
+  def onException(t: Throwable) {}
+
   def dao = ShoppingCartReloaded.instance.dao
 
   def withBukkit(f: () => Unit) = {

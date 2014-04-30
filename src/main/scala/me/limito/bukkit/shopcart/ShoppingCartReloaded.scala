@@ -121,6 +121,7 @@ class ShoppingCartReloaded(val plugin: JavaPlugin) extends CommandExecutor {
           val req = new RequestPutItem(sender, sender.getName, stack.clone(), stack.getAmount)
           requestManager.handleRequest(req)
         } else sender.sendMessage(lang.get("cart-put.no-item"))
+      case Array("load") => requestManager.handleRequest(new RequestLoadItem(sender, sender.getName))
       case Array() =>
         val req = new RequestItemsList(sender)
         requestManager.handleRequest(req)

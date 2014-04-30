@@ -36,12 +36,24 @@ class RequestManager(val plugin: ShoppingCartReloaded) {
     try {
       f
     } catch {
-      case e: NoPermissionException => request.sendMessage(lang.get("cart.no-perms"))
+      case e: NoPermissionException =>
+        request.sendMessage(lang.get("cart.no-perms"))
+        callRequestExceptionCallback(request, e)
       case e: Throwable =>
         request.sendMessage(lang.get("cart.error"))
-        plugin.getLogger.log(Level.SEVERE, "Error completing request " + toString, e)
+        plugin.getLogger.log(Level.SEVERE, "Error completing request " + request.getClass, e)
+        callRequestExceptionCallback(request, e)
     } finally {
       onCompleted(request)
+    }
+  }
+
+  def callRequestExceptionCallback(request: Request, ex: Throwable) {
+    try {
+      request.onException(ex)
+    } catch {
+      case e: Throwable =>
+        plugin.getLogger.log(Level.SEVERE, "Error completing request " + request.getClass, e)
     }
   }
 
