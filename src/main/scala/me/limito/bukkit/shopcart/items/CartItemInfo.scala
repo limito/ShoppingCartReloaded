@@ -22,6 +22,7 @@ class CartItemInfo(var id: Long,
         case "money" => toMoneyItem
         case "rgown" => toWGRegion(WGOwner)
         case "rgmem" => toWGRegion(WGMember)
+        case "permgroup" => toPermGroup
         case _ => new CartItemUnknown()
       }
     } catch {
@@ -31,6 +32,7 @@ class CartItemInfo(var id: Long,
     }
   }
 
+  private def toPermGroup = new CartItemPermGroup(item)
   private def toWGRegion(membershipType: WGMembershipType) = new CartItemWG(item, membershipType, amount)
   private def toMoneyItem: CartItemMoney = new CartItemMoney(amount)
 
