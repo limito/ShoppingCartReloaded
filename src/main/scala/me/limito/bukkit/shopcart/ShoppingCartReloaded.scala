@@ -78,17 +78,23 @@ class ShoppingCartReloaded(val plugin: JavaPlugin) extends CommandExecutor {
   }
 
   def initDatabase() {
-    plugin.saveDefaultConfig()
-    val section = plugin.getConfig.getConfigurationSection("db")
+    try {
+      plugin.saveDefaultConfig()
+      val section = plugin.getConfig.getConfigurationSection("db")
 
-    val ormliteLogFile = new File(plugin.getDataFolder, "ormlite.log")
-    LocalLog.openLogFile(ormliteLogFile.getAbsolutePath)
+      val ormliteLogFile = new File(plugin.getDataFolder, "ormlite.log")
+      LocalLog.openLogFile(ormliteLogFile.getAbsolutePath)
 
-    val connConfig = ConnectionConfig.fromYaml(section)
-    val dbConfig = DatabaseConfig.fromYaml(section)
+      val connConfig = ConnectionConfig.fromYaml(section)
+      val dbConfig = DatabaseConfig.fromYaml(section)
 
-    connectionSource = new JdbcConnectionSource(connConfig.url, connConfig.username, connConfig.password)
-    dao = new CartItemInfoDao(connectionSource, dbConfig)
+      connectionSource = new JdbcConnectionSource(connConfig.url, connConfig.username, connConfig.password)
+      dao = new CartItemInfoDao(connectionSource, dbConfig)
+
+      dao.setupTableAndStatements()
+    } catch {
+      case e: Exception => getLogger.log(Level.WARNING, "Error setting up DB", e)
+    }
   }
 
   def initNbt() {

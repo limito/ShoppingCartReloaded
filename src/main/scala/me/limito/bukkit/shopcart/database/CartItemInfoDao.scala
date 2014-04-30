@@ -10,8 +10,7 @@ import com.j256.ormlite.stmt.SelectArg
 class CartItemInfoDao(connSource: JdbcConnectionSource, config: DatabaseConfig) extends DaoHelper {
   var dao: Dao[CartItemInfo, Long] = _
 
-  setupStatements()
-  def setupStatements() {
+  def setupTableAndStatements() {
     val columns = config.columns
     val fieldsList = List(
       idConfig("id", columns("id")),
@@ -25,8 +24,9 @@ class CartItemInfoDao(connSource: JdbcConnectionSource, config: DatabaseConfig) 
     val fullFieldList = (fieldsList ::: serverFieldList).asJava
 
     val tableConfig = new DatabaseTableConfig(classOf[CartItemInfo], config.table, fullFieldList)
-    TableUtils.createTableIfNotExists(connSource, tableConfig)
     dao = DaoManager.createDao(connSource, tableConfig)
+
+    TableUtils.createTableIfNotExists(connSource, tableConfig)
   }
 
   def addItem(info: CartItemInfo): Long = withExceptionHandling {
