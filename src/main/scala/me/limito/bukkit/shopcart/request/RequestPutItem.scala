@@ -12,7 +12,7 @@ class RequestPutItem(commandSender: CommandSender, owner: String, itemStack: Ite
 
   /** Здесь идет проверка условий для выполнения запроса (например, проверка наличия пермов) **/
   override def prehandle() {
-    requirePermission("cart.put")
+    requirePermission("cart.admin.put")
 
     info = createInfo(itemStack)
   }

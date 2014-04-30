@@ -11,7 +11,7 @@ class RequestItemGive(commandSender: CommandSender, itemId: Int, itemAmount: Int
 
   /** Здесь идет проверка условий для выполнения запроса (например, проверка наличия пермов) **/
   override def prehandle() = {
-    requirePermission("cart.get")
+    requirePermission("cart.user.get")
 
     if (!commandSender.isInstanceOf[Player]) {
       sendMessage(lang.get("cart.not-a-player"))

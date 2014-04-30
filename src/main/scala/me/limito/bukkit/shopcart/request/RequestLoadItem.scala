@@ -14,7 +14,7 @@ class RequestLoadItem(commandSender: CommandSender, owner: String) extends Reque
 
   /** Здесь идет проверка условий для выполнения запроса (например, проверка наличия пермов) **/
   override def prehandle() {
-    requirePermission("cart.load")
+    requirePermission("cart.useradv.load")
 
     commandSender match {
       case player: Player =>

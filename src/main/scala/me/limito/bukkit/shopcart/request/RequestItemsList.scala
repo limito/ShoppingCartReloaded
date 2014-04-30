@@ -5,7 +5,7 @@ import me.limito.bukkit.shopcart.ShoppingCartReloaded
 
 class RequestItemsList(commandSender: CommandSender) extends Request(commandSender) {
   override def prehandle() {
-    requirePermission("cart.list")
+    requirePermission("cart.user.list")
   }
 
   def handle() {

@@ -11,7 +11,7 @@ class RequestGiveAll(commandSender: CommandSender) extends Request(commandSender
   case class ItemGiveInfo(info: CartItemInfo, item: CartItem, amount: Int)
 
   override def prehandle() {
-    requirePermission("cart.get")
+    requirePermission("cart.user.get")
 
     if (!commandSender.isInstanceOf[Player]) {
       sendMessage(lang.get("cart.not-a-player"))
