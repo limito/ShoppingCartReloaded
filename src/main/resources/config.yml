@@ -3,7 +3,6 @@ db:
   username: shopcart
   password: shopcart
   table: shopcart
-  connections: 2   # Максимальное количество одновременных подключений
   column:
     id: id
     type: type

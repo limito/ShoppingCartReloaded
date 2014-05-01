@@ -6,24 +6,26 @@ import com.j256.ormlite.dao.{DaoManager, Dao}
 import scala.collection.JavaConverters._
 import com.j256.ormlite.table.{TableUtils, DatabaseTableConfig}
 import com.j256.ormlite.stmt.SelectArg
+import com.j256.ormlite.field.DatabaseFieldConfig
 
 class CartItemInfoDao(connSource: JdbcConnectionSource, config: DatabaseConfig) extends DaoHelper {
   var dao: Dao[CartItemInfo, Long] = _
 
   def setupTableAndStatements() {
     val columns = config.columns
-    val fieldsList = List(
-      idConfig("id", columns("id")),
-      fieldConfig("itemType", columns("type"), "item"),
-      fieldConfig("item", columns("item"), nullable = false),
-      fieldConfig("owner", columns("player"), nullable = false),
-      fieldConfig("amount", columns("amount"), nullable = false),
-      fieldConfig("extra", columns("extra"), nullable = true)
-    )
-    val serverFieldList = if (config.serverName.isDefined) List(fieldConfig("server", columns("server"), nullable = false)) else Nil
-    val fullFieldList = (fieldsList ::: serverFieldList).asJava
+    val fieldsList =
+      (Some(idConfig("id", columns("id"))) ++
+      fieldConfig("itemType", columns("type"), "item") ++
+      fieldConfig("item", columns("item"), nullable = false) ++
+      fieldConfig("owner", columns("player"), nullable = false) ++
+      fieldConfig("amount", columns("amount"), nullable = false) ++
+      fieldConfig("extra", columns("extra"), nullable = true)).toList
 
-    val tableConfig = new DatabaseTableConfig(classOf[CartItemInfo], config.table, fullFieldList)
+
+    val serverFieldList = if (config.serverName.isDefined) fieldConfig("server", columns("server"), nullable = false).toList else Nil
+    val fullFieldList = fieldsList ::: serverFieldList
+
+    val tableConfig = new DatabaseTableConfig(classOf[CartItemInfo], config.table, fullFieldList.asJava)
     dao = DaoManager.createDao(connSource, tableConfig)
 
     TableUtils.createTableIfNotExists(connSource, tableConfig)

@@ -11,7 +11,7 @@ class CartItemInfo(var id: Long,
                    var amount: Int,
                    var extra: String,
                    var server: String = null) {
-  def this() = this(0, null, null, null, 0, null)
+  def this() = this(0, "item", "0", "-", 1, null, null)
 
   override def toString = String.valueOf(id) + ": " + item
 
