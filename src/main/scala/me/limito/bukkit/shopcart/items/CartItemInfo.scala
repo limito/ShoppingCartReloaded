@@ -32,9 +32,35 @@ class CartItemInfo(var id: Long,
     }
   }
 
-  private def toPermGroup = new CartItemPermGroup(item)
   private def toWGRegion(membershipType: WGMembershipType) = new CartItemWG(item, membershipType, amount)
   private def toMoneyItem: CartItemMoney = new CartItemMoney(amount)
+
+  private def toPermGroup: CartItemPermGroup = {
+    val (groupName, paramsMap) = getMainPartAndParamsMap(item)
+    new CartItemPermGroup(groupName, paramsMap.get("world"))
+  }
+
+  private def getMainPartAndParamsMap(str: String): (String, Map[String, String]) = {
+    val paramDelimIndex = str.indexOf('?')
+    if (paramDelimIndex >= 0) {
+      val paramString = str.drop(paramDelimIndex + 1)
+      val paramStringMap = paramStringToMap(paramString)
+      val mainPart = str.take(paramDelimIndex)
+
+      (mainPart, paramStringMap)
+    }
+    else
+      (item, Map())
+  }
+
+  private def paramStringToMap(paramString: String): Map[String, String] = {
+    val paramsAsString = paramString.split('&')
+    val paramsAsTuples = paramsAsString.map(param => {
+      val keyValueDelimiter = param.indexOf('=')
+      (param.take(keyValueDelimiter), param.drop(keyValueDelimiter + 1))
+    })
+    Map(paramsAsTuples: _*)
+  }
 
   private def toMinecraftItem: CartItemItem = {
     val Array(main, enchants @ _*) = item.split("#", 2)
