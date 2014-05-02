@@ -5,6 +5,16 @@ import items.LeveledEnchantment
 import org.bukkit.configuration.{ConfigurationSection, Configuration}
 import collection.JavaConversions._
 import org.bukkit.{ChatColor, Material}
+import me.limito.bukkit.shopcart.Lang.{ExtraLangData, WorldName}
+
+object Lang {
+  abstract sealed class ExtraLangData {
+    def getExtraString(lang: Lang): String
+  }
+  case class WorldName(name: String) extends ExtraLangData {
+    override def getExtraString(lang: Lang): String = lang.format("misc.world", name)
+  }
+}
 
 class Lang {
   val romanNums = Array("0", "I", "II", "III", "IV", "V")
@@ -41,6 +51,14 @@ class Lang {
 
   def get(formatName: String) = messageFormats.getOrElse(formatName, formatName)
   def format(formatName: String, data: Any*):String = get(formatName).format(data: _*)
+  def formatExtra(formatName: String, extra: Seq[ExtraLangData], data: Any*): String = {
+    val formatted = get(formatName).format(data: _*)
+    val extraString = if (extra.length > 0) extra.map(_.getExtraString(this)).mkString(" (", ChatColor.WHITE + ", ", ")") else null
+    if (extraString != null)
+      formatted + extraString
+    else
+      formatted
+  }
 
   def formatSubtype(formatName: String, param: Any) = {
     messageFormats.getOrElse(formatName + "." + param, get(formatName + ".default")).format(param)
