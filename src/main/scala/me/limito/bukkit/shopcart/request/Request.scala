@@ -1,8 +1,6 @@
 package me.limito.bukkit.shopcart.request
 
 import org.bukkit.command.CommandSender
-import me.limito.bukkit.shopcart.database.DatabaseScheduler
-import java.util.logging.Level
 import me.limito.bukkit.shopcart.ShoppingCartReloaded
 import java.util.concurrent.CountDownLatch
 
