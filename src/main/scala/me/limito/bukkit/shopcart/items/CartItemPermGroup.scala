@@ -16,7 +16,7 @@ class CartItemPermGroup(groupName: String) extends CartItem {
     if (rsp != null) {
       val permProvider = rsp.getProvider
       if (!permProvider.playerInGroup(player, groupName)) {
-        permProvider.playerAddGroup(player, groupName)
+        permProvider.playerAddGroup(null.asInstanceOf[String], player.getName, groupName)
         1
       } else 0
     } else 0
