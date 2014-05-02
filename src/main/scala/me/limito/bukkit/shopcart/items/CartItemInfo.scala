@@ -3,6 +3,8 @@ package me.limito.bukkit.shopcart.items
 import me.limito.bukkit.shopcart.ShoppingCartReloaded
 import java.util.logging.Level
 import me.limito.bukkit.shopcart.optional.nbt.NBTTag
+import scala.collection.mutable
+import org.bukkit.enchantments.Enchantment
 
 class CartItemInfo(var id: Long,
                    var itemType: String,
@@ -63,11 +65,24 @@ class CartItemInfo(var id: Long,
   }
 
   private def toMinecraftItem: CartItemItem = {
-    val Array(main, enchants @ _*) = item.split("#", 2)
+    val poundEnchantDelimIndex = item.indexOf('#')
+    val chestshopEnchantDelimIndex = item.indexOf('-')
+
+    val enchantmentsChestshop =
+      if(chestshopEnchantDelimIndex >= 0)
+        parseChestshopEnchantments(item.drop(chestshopEnchantDelimIndex + 1))
+      else null
+    val enchantmentsPound =
+      if (enchantmentsChestshop == null && poundEnchantDelimIndex >= 0)
+        parsePoundEnchantments(item.drop(poundEnchantDelimIndex + 1))
+      else null
+    val enchantments = if(enchantmentsChestshop != null) enchantmentsChestshop else enchantmentsPound
+    val enchantmentsIndex = if(enchantmentsChestshop != null) chestshopEnchantDelimIndex else poundEnchantDelimIndex
+
+    val main = if (enchantmentsIndex < 0) item else item.take(enchantmentsIndex)
     val Array(id, meta @ _*) = main.split(":", 2)
 
-    val ench = if(enchants.size > 0) parsePoundEnchantments(enchants(0)) else null
-    new CartItemItem(id.toInt, if (meta.isEmpty) 0 else meta.head.toShort, amount, ench, parseNBT)
+    new CartItemItem(id.toInt, if (meta.isEmpty) 0 else meta.head.toShort, amount, enchantments, parseNBT)
   }
 
   private def parseNBT: NBTTag = {
@@ -81,4 +96,23 @@ class CartItemInfo(var id: Long,
     val Array(id, level) = d.split(":")
     new LeveledEnchantment(id.toInt, level.toInt)
   })
+
+  private def parseChestshopEnchantments(str: String): Array[LeveledEnchantment] = {
+    val base10NumberAsString = new StringBuilder(java.lang.Long.parseLong(str, 32).toString)
+    while (base10NumberAsString.length % 3 != 0) {
+      base10NumberAsString.insert(0, '0')
+    }
+
+    val enchants = new Array[LeveledEnchantment](base10NumberAsString.length / 3)
+    for (i <- enchants.indices) {
+      val oneEnchantmentSubstring = base10NumberAsString.substring(i * 3, i * 3 + 3)
+
+      val enchId = Integer.parseInt(oneEnchantmentSubstring.substring(0, 2))
+      val enchLevel = Integer.parseInt(oneEnchantmentSubstring.substring(2))
+
+      enchants(i) = new LeveledEnchantment(enchId, enchLevel)
+    }
+
+    enchants
+  }
 }
