@@ -21,14 +21,19 @@ class CartItemInfoDao(connSource: JdbcConnectionSource, config: DatabaseConfig) 
       fieldConfig("amount", columns("amount"), nullable = false) ++
       fieldConfig("extra", columns("extra"), nullable = true)).toList
 
-
     val serverFieldList = if (config.serverName.isDefined) fieldConfig("server", columns("server"), nullable = false, indexed = true).toList else Nil
     val fullFieldList = fieldsList ::: serverFieldList
 
     val tableConfig = new DatabaseTableConfig(classOf[CartItemInfo], config.table, fullFieldList.asJava)
     dao = DaoManager.createDao(connSource, tableConfig)
 
-    TableUtils.createTableIfNotExists(connSource, tableConfig)
+    if (!tableExists())
+     TableUtils.createTableIfNotExists(connSource, tableConfig)
+  }
+
+  def tableExists(): Boolean = {
+    val conn = connSource.getReadOnlyConnection
+    conn.isTableExists(config.table)
   }
 
   def addItem(info: CartItemInfo): Long = withExceptionHandling {

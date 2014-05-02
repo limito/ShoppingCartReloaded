@@ -13,6 +13,7 @@ import collection.JavaConversions._
 import me.limito.bukkit.shopcart.optional.nbt.{PowerNBTHelper, NBTHelperStub, NBTHelper}
 import com.j256.ormlite.jdbc.JdbcConnectionSource
 import com.j256.ormlite.logger.LocalLog
+import org.bukkit.Bukkit
 
 class ShoppingCartReloaded(val plugin: JavaPlugin) extends CommandExecutor {
   ShoppingCartReloaded.instance = this
@@ -40,6 +41,7 @@ class ShoppingCartReloaded(val plugin: JavaPlugin) extends CommandExecutor {
     lang = new Lang()
     dao = null
 
+    initPex()
     loadMessages()
     loadItemNames()
     loadEnchantmentNames()
@@ -95,6 +97,13 @@ class ShoppingCartReloaded(val plugin: JavaPlugin) extends CommandExecutor {
     } catch {
       case e: Exception => getLogger.log(Level.WARNING, "Error setting up DB", e)
     }
+  }
+
+  def initPex() {
+    if (ShoppingCartReloaded.usePex)
+      getLogger.info("Using PermissionEx")
+    else
+      getLogger.info("Using Vault for permissions")
   }
 
   def initNbt() {
@@ -167,4 +176,5 @@ class ShoppingCartReloaded(val plugin: JavaPlugin) extends CommandExecutor {
 
 object ShoppingCartReloaded {
   var instance: ShoppingCartReloaded = _
+  val usePex = Bukkit.getPluginManager.getPlugin("PermissionsEx") != null
 }

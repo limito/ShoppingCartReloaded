@@ -67,6 +67,13 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/PowerNBT.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>ru.tehkode</groupId>
+            <artifactId>PermissionsEx</artifactId>
+            <version>1.19.6</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/PermissionsEx.jar</systemPath>
+        </dependency>
 
         <dependency>
             <groupId>com.j256.ormlite</groupId>

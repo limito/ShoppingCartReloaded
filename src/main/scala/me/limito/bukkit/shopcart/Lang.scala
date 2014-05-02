@@ -6,6 +6,7 @@ import org.bukkit.configuration.{ConfigurationSection, Configuration}
 import collection.JavaConversions._
 import org.bukkit.{ChatColor, Material}
 import me.limito.bukkit.shopcart.Lang.{ExtraLangData, WorldName}
+import java.util.concurrent.TimeUnit
 
 object Lang {
   abstract sealed class ExtraLangData {
@@ -13,6 +14,26 @@ object Lang {
   }
   case class WorldName(name: String) extends ExtraLangData {
     override def getExtraString(lang: Lang): String = lang.format("misc.world", name)
+  }
+  case class TimeDuration(durationSec: Long) extends ExtraLangData {
+    override def getExtraString(lang: Lang): String = lang.format("misc.duration", getIntervalString(lang))
+
+    def getIntervalString(lang: Lang): String = {
+      val secondsInMinute = 60L
+      val secondsInHours = secondsInMinute * 60
+      val secondsInDay = secondsInHours * 24
+
+      var secondsLeft = durationSec
+      val days = secondsLeft / secondsInDay
+      secondsLeft -= days * secondsInDay
+      val hours = secondsLeft / secondsInHours
+      secondsLeft -= hours * secondsInHours
+      val minutes = secondsLeft / secondsInMinute
+      secondsLeft -= minutes * secondsInMinute
+      val seconds = secondsLeft
+
+      lang.format("misc.timeinterval", days, hours, minutes, seconds)
+    }
   }
 }
 
@@ -53,15 +74,26 @@ class Lang {
   def format(formatName: String, data: Any*):String = get(formatName).format(data: _*)
   def formatExtra(formatName: String, extra: Seq[ExtraLangData], data: Any*): String = {
     val formatted = get(formatName).format(data: _*)
-    val extraString = if (extra.length > 0) extra.map(_.getExtraString(this)).mkString(" (", ChatColor.WHITE + ", ", ")") else null
+    val extraString = createExtra(extra)
+    if (extraString != null) formatted + extraString else formatted
+  }
+
+  def createExtra(extra: Seq[ExtraLangData]): String = {
+    val extraString = if (extra.length > 0) extra.map(_.getExtraString(this)).mkString(ChatColor.WHITE + " (", ChatColor.WHITE + ", ", ")") else null
     if (extraString != null)
-      formatted + extraString
+      extraString
     else
-      formatted
+      null
   }
 
   def formatSubtype(formatName: String, param: Any) = {
     messageFormats.getOrElse(formatName + "." + param, get(formatName + ".default")).format(param)
+  }
+
+  def formatSubtypeExtra(formatName: String, param: Any, extra: Seq[ExtraLangData]) = {
+    val formatted = formatSubtype(formatName, param)
+    val extraString = createExtra(extra)
+    if (extraString != null) formatted + extraString else formatted
   }
 
   def getItemName(id: Int, meta: Int): String = {

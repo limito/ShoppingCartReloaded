@@ -1,6 +1,7 @@
 package me.limito.bukkit.shopcart.database
 
 import com.j256.ormlite.field.DatabaseFieldConfig
+import java.sql.Connection
 
 trait DaoHelper {
   def fieldConfig(fieldName: String, columnName: String, nullable: Boolean = true, defaultValue: Option[String] = None, indexed: Boolean = false): Option[DatabaseFieldConfig] = {

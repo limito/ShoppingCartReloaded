@@ -22,7 +22,6 @@ cart:
   item: §a%d. %s x %d
   region-own: Регион §9%s
   region-mem: Членство в регионе §9%s
-  perm: Группа %s навсегда
   money: §6Монеты
   unknown: Неизвестный предмет
 
@@ -55,7 +54,7 @@ cart-get:
   get-rg-owner: §aВы стали владельцем региона §9%s
   get-rg-member: §aВы стали членом региона §9%s
   get-money: §aВы стали богаче на §6%d монет
-  get-permgroup: §aВы получили §6%s§a навсегда
+  get-permgroup: §aВы получили §6%s§a
 
   get-nothing: §4Вы ничего не получили
   not-number: §4%s не является натуральным числом
@@ -65,3 +64,5 @@ cart-get:
 
 misc:
   world: мир %s
+  duration: "продолжительность: %s"
+  timeinterval: "%dд %dч %dм %dс"

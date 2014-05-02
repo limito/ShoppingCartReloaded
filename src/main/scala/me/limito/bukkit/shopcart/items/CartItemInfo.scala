@@ -37,9 +37,16 @@ class CartItemInfo(var id: Long,
   private def toWGRegion(membershipType: WGMembershipType) = new CartItemWG(item, membershipType, amount)
   private def toMoneyItem: CartItemMoney = new CartItemMoney(amount)
 
-  private def toPermGroup: CartItemPermGroup = {
+  private def toPermGroup: CartItem = {
     val (groupName, paramsMap) = getMainPartAndParamsMap(item)
-    new CartItemPermGroup(groupName, paramsMap.get("world"))
+
+    val world = paramsMap.get("world")
+    val lifetime = paramsMap.get("lifetime").map(_.toLong)
+
+    if (ShoppingCartReloaded.usePex)
+      new CartItemPermGroupPex(groupName, world, lifetime)
+    else
+      new CartItemPermGroup(groupName, world)
   }
 
   private def getMainPartAndParamsMap(str: String): (String, Map[String, String]) = {
