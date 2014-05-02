@@ -34,12 +34,14 @@ public class PluginPreloader extends JavaPlugin {
         String[] librariesUrl = {
                 "http://repo1.maven.org/maven2/org/scala-lang/scala-library/2.11.0/scala-library-2.11.0.jar",
                 "http://repo1.maven.org/maven2/com/j256/ormlite/ormlite-core/4.48/ormlite-core-4.48.jar",
-                "http://repo1.maven.org/maven2/com/j256/ormlite/ormlite-jdbc/4.48/ormlite-jdbc-4.48.jar"
+                "http://repo1.maven.org/maven2/com/j256/ormlite/ormlite-jdbc/4.48/ormlite-jdbc-4.48.jar",
+                "http://repo1.maven.org/maven2/com/google/code/gson/gson/2.1/gson-2.1.jar"
         };
         File[] librariesFiles = new File[]{
                 new File(librariesDir, "scala-library-2.11.0.jar"),
                 new File(librariesDir, "ormlite-core-4.48.jar"),
-                new File(librariesDir, "ormlite-jdbc-4.48.jar")
+                new File(librariesDir, "ormlite-jdbc-4.48.jar"),
+                new File(librariesDir, "gson-2.1.jar")
         };
 
         for (int i = 0; i < librariesUrl.length; i++) {

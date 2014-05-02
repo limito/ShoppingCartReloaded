@@ -553,10 +553,4 @@ public class JsonToNBT
             }
         }
     }
-
-    static class NBTException extends RuntimeException {
-        NBTException(String message) {
-            super(message);
-        }
-    }
 }

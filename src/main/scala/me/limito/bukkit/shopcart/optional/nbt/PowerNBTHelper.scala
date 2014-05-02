@@ -3,7 +3,7 @@ package me.limito.bukkit.shopcart.optional.nbt
 import me.dpohvar.powernbt.nbt.{NBTContainerItem, NBTBase}
 import org.bukkit.inventory.{Inventory, ItemStack}
 import me.limito.bukkit.shopcart.ShoppingCartReloaded
-import me.limito.bukkit.jsonnbt.{Test, JsonToNBT, NBTToJson}
+import me.limito.bukkit.jsonnbt._
 import java.util.logging.Level
 
 class PowerNBTHelper extends NBTHelper {
@@ -30,10 +30,20 @@ class PowerNBTHelper extends NBTHelper {
 
   @throws[NBTParseException]
   override def parseJson(json: String): NBTTag = {
-    val nbt: NBTBase = JsonToNBT.parse(json)
-    NBTTagImpl(nbt)
-  }
+    try {
+      val nbt: NBTBase = JsonToNBTLegacy.parse(json)
+      return NBTTagImpl(nbt)
+    } catch {
+      case ex: NBTException => // Try another parser
+    }
 
+    try {
+      val nbt: NBTBase = JsonToNBT.parse(json)
+      NBTTagImpl(nbt)
+    } catch {
+      case ex: NBTException => throw new NBTParseException("Error parsing json", ex)
+    }
+  }
   override def placeTag(tag: NBTTag, stack: ItemStack) = {
     val tagi = tag.asInstanceOf[NBTTagImpl]
 
