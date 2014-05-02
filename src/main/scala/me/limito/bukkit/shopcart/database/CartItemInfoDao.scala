@@ -15,14 +15,14 @@ class CartItemInfoDao(connSource: JdbcConnectionSource, config: DatabaseConfig) 
     val columns = config.columns
     val fieldsList =
       (Some(idConfig("id", columns("id"))) ++
-      fieldConfig("itemType", columns("type"), "item") ++
+      fieldConfig("itemType", columns("type"), nullable = false, defaultValue = Some("item")) ++
       fieldConfig("item", columns("item"), nullable = false) ++
-      fieldConfig("owner", columns("player"), nullable = false) ++
+      fieldConfig("owner", columns("player"), nullable = false, indexed = true) ++
       fieldConfig("amount", columns("amount"), nullable = false) ++
       fieldConfig("extra", columns("extra"), nullable = true)).toList
 
 
-    val serverFieldList = if (config.serverName.isDefined) fieldConfig("server", columns("server"), nullable = false).toList else Nil
+    val serverFieldList = if (config.serverName.isDefined) fieldConfig("server", columns("server"), nullable = false, indexed = true).toList else Nil
     val fullFieldList = fieldsList ::: serverFieldList
 
     val tableConfig = new DatabaseTableConfig(classOf[CartItemInfo], config.table, fullFieldList.asJava)

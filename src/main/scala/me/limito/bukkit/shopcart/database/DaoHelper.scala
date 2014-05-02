@@ -3,23 +3,13 @@ package me.limito.bukkit.shopcart.database
 import com.j256.ormlite.field.DatabaseFieldConfig
 
 trait DaoHelper {
-  def fieldConfig(fieldName: String, columnName: String, nullable: Boolean): Option[DatabaseFieldConfig] = {
+  def fieldConfig(fieldName: String, columnName: String, nullable: Boolean = true, defaultValue: Option[String] = None, indexed: Boolean = false): Option[DatabaseFieldConfig] = {
     if (columnName != "-") {
       val cfg = new DatabaseFieldConfig(fieldName)
       cfg.setColumnName(columnName)
       cfg.setCanBeNull(nullable)
-      Some(cfg)
-    } else {
-      None
-    }
-  }
-
-  def fieldConfig(fieldName: String, columnName: String, defaultValue: String): Option[DatabaseFieldConfig] = {
-    if (columnName != "-") {
-      val cfg = new DatabaseFieldConfig(fieldName)
-      cfg.setColumnName(columnName)
-      cfg.setCanBeNull(false)
-      cfg.setDefaultValue(defaultValue)
+      cfg.setIndex(indexed)
+      defaultValue.foreach(cfg.setDefaultValue)
       Some(cfg)
     } else {
       None
