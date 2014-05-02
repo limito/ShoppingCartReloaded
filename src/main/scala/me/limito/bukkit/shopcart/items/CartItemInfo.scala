@@ -86,7 +86,7 @@ class CartItemInfo(var id: Long,
   }
 
   private def parseNBT: NBTTag = {
-    if (extra == null)
+    if (extra == null || extra.isEmpty)
       null
     else
       ShoppingCartReloaded.instance.nbtHelper.parseJson(extra)
