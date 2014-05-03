@@ -5,6 +5,10 @@ perm-group:
   premium: §6Премиум
   newbie: §6Защита новичка
 
+perm:
+  default: §6Привилегия %s
+  cartr.useradv.load: §6Возможность загружать вещи в корзину
+
 cart:
   not-a-player: Только игроки могут выполнять эту команду
   n-items:
@@ -40,12 +44,13 @@ cart-put:
   no-item: §4Возьмите предмет в руку
 
 cart-load:
-  put: 'Вещь добавлена в корзину (id: %d)'
+  load: 'Вещь добавлена в корзину (id: %d)'
   no-item: §4Возьмите предмет в руку
 
 cart-get:
   no-money: §4Передача денег не поддерживается
   already-in-perm-group: §4У Вас уже есть %s
+  already-has-perm: §4У Вас уже есть %s
 
   no-wg-rg: §4Нет такого региона §9%s
   no-such-id: §4Покупки с таким номером нет
@@ -55,6 +60,7 @@ cart-get:
   get-rg-member: §aВы стали членом региона §9%s
   get-money: §aВы стали богаче на §6%d монет
   get-permgroup: §aВы получили §6%s§a
+  get-perm: §aВы получили §6%s§a
 
   get-nothing: §4Вы ничего не получили
   not-number: §4%s не является натуральным числом

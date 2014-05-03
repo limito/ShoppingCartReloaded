@@ -25,6 +25,7 @@ class CartItemInfo(var id: Long,
         case "rgown" => toWGRegion(WGOwner)
         case "rgmem" => toWGRegion(WGMember)
         case "permgroup" => toPermGroup
+        case "perm" => toPerm
         case _ => new CartItemUnknown()
       }
     } catch {
@@ -36,6 +37,18 @@ class CartItemInfo(var id: Long,
 
   private def toWGRegion(membershipType: WGMembershipType) = new CartItemWG(item, membershipType, amount)
   private def toMoneyItem: CartItemMoney = new CartItemMoney(amount)
+
+  private def toPerm: CartItem = {
+    val (groupName, paramsMap) = getMainPartAndParamsMap(item)
+
+    val world = paramsMap.get("world")
+    val lifetime = paramsMap.get("lifetime").map(_.toLong)
+
+    if (ShoppingCartReloaded.usePex)
+      new CartItemPermPex(groupName, world, lifetime)
+    else
+      new CartItemUnknown()
+  }
 
   private def toPermGroup: CartItem = {
     val (groupName, paramsMap) = getMainPartAndParamsMap(item)
