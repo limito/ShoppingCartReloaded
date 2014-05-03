@@ -47,7 +47,7 @@ class CartItemInfo(var id: Long,
     if (ShoppingCartReloaded.usePex)
       new CartItemPermPex(groupName, world, lifetime)
     else
-      new CartItemUnknown()
+      new CartItemPerm(groupName, world)
   }
 
   private def toPermGroup: CartItem = {
