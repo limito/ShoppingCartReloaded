@@ -57,11 +57,10 @@ class CartItemInfoDao(connSource: JdbcConnectionSource, config: DatabaseConfig) 
 
   def getItemInfoById(id: Long): Option[CartItemInfo] = withExceptionHandling {
     val queryBuilder = dao.queryBuilder()
+    val queryWhere = queryBuilder.where().eq(config.columns("id"), new SelectArg(id))
     if (config.serverName.isDefined) {
-      queryBuilder.where().
-        eq(config.columns("server"), new SelectArg(config.serverName.get)).
-        and().
-        eq(config.columns("id"), new SelectArg(id))
+      queryWhere.and().
+        eq(config.columns("server"), new SelectArg(config.serverName.get))
     }
     dao.query(queryBuilder.prepare()).asScala.headOption
   }
