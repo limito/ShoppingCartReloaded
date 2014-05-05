@@ -2,7 +2,7 @@ package me.limito.bukkit.shopcart.request
 
 import org.bukkit.command.CommandSender
 import org.bukkit.inventory.ItemStack
-import me.limito.bukkit.shopcart.items.CartItemInfo
+import me.limito.bukkit.shopcart.items.{ItemEncoder, CartItemInfo}
 import org.bukkit.enchantments.Enchantment
 import collection.JavaConversions._
 import me.limito.bukkit.shopcart.ShoppingCartReloaded
@@ -24,7 +24,7 @@ class RequestLoadItem(commandSender: CommandSender, owner: String) extends Reque
           val heldItemSlot = player.getInventory.getHeldItemSlot
           player.getInventory.setItem(heldItemSlot, null)
 
-          info = createInfo(stack)
+          info = ItemEncoder.createInfo(stack, player.getName, stack.getAmount)
         } else {
           sendMessage(ShoppingCartReloaded.instance.lang.format("cart-load.no-item"))
         }

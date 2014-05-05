@@ -6,8 +6,12 @@ import me.limito.bukkit.shopcart.{ShoppingCartReloaded, Lang}
 import org.bukkit.enchantments.Enchantment
 import me.limito.bukkit.shopcart.optional.nbt.NBTTag
 import scala.annotation.tailrec
+import scala.collection.JavaConverters._
+import java.util
 
-class CartItemItem(val itemId: Int, val itemMeta: Short, val amount: Int, val enchantments: Array[LeveledEnchantment], val nbtTag: NBTTag) extends CartItem {
+case class NameAndLore(name: String, lore: String)
+
+class CartItemItem(val itemId: Int, val itemMeta: Short, val amount: Int, val enchantments: Array[LeveledEnchantment], val nbtTag: NBTTag, val nameAndLoreOption: Option[NameAndLore]) extends CartItem {
   def giveToPlayer(player: Player):Int = giveToPlayer(player, amount)
 
   def giveToPlayer(player: Player, amount: Int):Int = {
@@ -16,6 +20,17 @@ class CartItemItem(val itemId: Int, val itemMeta: Short, val amount: Int, val en
 
     if (enchantments != null)
       enchantments foreach(e => stack.addUnsafeEnchantment(Enchantment.getById(e.id), e.level))
+    if (nameAndLoreOption.isDefined) {
+      val nameAndLore = nameAndLoreOption.get
+      val meta = stack.getItemMeta
+
+      if (nameAndLore.name != null)
+        meta.setDisplayName(nameAndLore.name)
+      if (nameAndLore.lore != null)
+        meta.setLore(nameAndLore.lore.split('\n').toList.asJava)
+
+      stack.setItemMeta(meta)
+    }
 
     give(player.getInventory, stack, amount, 0)
   }

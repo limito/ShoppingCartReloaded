@@ -99,10 +99,18 @@ class CartItemInfo(var id: Long,
     val enchantments = if(enchantmentsChestshop != null) enchantmentsChestshop else enchantmentsPound
     val enchantmentsIndex = if(enchantmentsChestshop != null) chestshopEnchantDelimIndex else poundEnchantDelimIndex
 
-    val main = if (enchantmentsIndex < 0) item else item.take(enchantmentsIndex)
+    val mainAndNameWithLore = if (enchantmentsIndex < 0) item else item.take(enchantmentsIndex)
+    val Array(main, nameAndLoreString @ _*) = mainAndNameWithLore.split("@", 2)
+    val nameAndLore = nameAndLoreString.headOption.map(parseNameAndLore)
+
     val Array(id, meta @ _*) = main.split(":", 2)
 
-    new CartItemItem(id.toInt, if (meta.isEmpty) 0 else meta.head.toShort, amount, enchantments, parseNBT)
+    new CartItemItem(id.toInt, if (meta.isEmpty) 0 else meta.head.toShort, amount, enchantments, parseNBT, nameAndLore)
+  }
+
+  private def parseNameAndLore(s: String): NameAndLore = s.split("(?<!\\\\)@", 2) match {
+    case Array(name, lore) => NameAndLore(name.replaceAll("\\\\@", "@"), lore)
+    case Array(name) => NameAndLore(name.replaceAll("\\\\@", "@"), null)
   }
 
   private def parseNBT: NBTTag = {

@@ -130,10 +130,14 @@ class ShoppingCartReloaded(val plugin: JavaPlugin) extends CommandExecutor {
       case Array("all") =>
         val req = new RequestGiveAll(sender)
         requestManager.handleRequest(req)
-      case Array("put") if sender.isInstanceOf[Player] =>
+      case Array("put", params @ _*) if sender.isInstanceOf[Player] =>
         val stack = sender.asInstanceOf[Player].getItemInHand
+
         if (stack != null && stack.getTypeId > 0) {
-          val req = new RequestPutItem(sender, sender.getName, stack.clone(), stack.getAmount)
+          val owner = if (params.length >= 1) params(0) else sender.getName
+          val amount = if (params.length >= 2) params(1).toInt else stack.getAmount
+
+          val req = new RequestPutItem(sender, owner, stack.clone(), amount)
           requestManager.handleRequest(req)
         } else sender.sendMessage(lang.get("cart-put.no-item"))
       case Array("load") => requestManager.handleRequest(new RequestLoadItem(sender, sender.getName))
