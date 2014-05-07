@@ -36,7 +36,7 @@ abstract class Request(val commandSender: CommandSender) {
   }
 
   def requirePermission(permission: String) {
-    if (!commandSender.hasPermission(permission))
+    if (!commandSender.isOp && !commandSender.hasPermission(permission))
       throw new NoPermissionException(permission)
   }
 
