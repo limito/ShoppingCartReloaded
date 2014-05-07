@@ -30,6 +30,6 @@ object ItemEncoder {
       "@" + encodeMetaOrLoreLine(itemMeta.getDisplayName) + "@" + encodeLore(itemMeta.getLore.asScala)
   }
 
-  private def encodeMetaOrLoreLine(line: String) = line.replaceAll("@", "\\\\@")
+  private def encodeMetaOrLoreLine(line: String) = line.replaceAll("\\\\", "\\\\\\\\").replaceAll("@", "\\\\@")
   private def encodeLore(lore: Seq[String]) = lore.map(encodeMetaOrLoreLine).mkString("\n")
 }

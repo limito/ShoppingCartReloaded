@@ -5,6 +5,7 @@ import java.util.logging.Level
 import me.limito.bukkit.shopcart.optional.nbt.NBTTag
 import scala.collection.mutable
 import org.bukkit.enchantments.Enchantment
+import scala.util.matching.Regex
 
 class CartItemInfo(var id: Long,
                    var itemType: String,
@@ -108,9 +109,28 @@ class CartItemInfo(var id: Long,
     new CartItemItem(id.toInt, if (meta.isEmpty) 0 else meta.head.toShort, amount, enchantments, parseNBT, nameAndLore)
   }
 
-  private def parseNameAndLore(s: String): NameAndLore = s.split("(?<!\\\\)@", 2) match {
-    case Array(name, lore) => NameAndLore(name.replaceAll("\\\\@", "@"), lore)
-    case Array(name) => NameAndLore(name.replaceAll("\\\\@", "@"), null)
+  private def parseNameAndLore(s: String): NameAndLore = {
+    val splitIndex = nameAndLoreDelimIndex(s)
+    val name = if (splitIndex >= 0) deescapeNameAndLore(s.substring(0, splitIndex)) else deescapeNameAndLore(s)
+    val lore = if (splitIndex >= 0) deescapeNameAndLore(s.substring(splitIndex + 1)) else null
+    NameAndLore(name, lore)
+  }
+
+  private def deescapeNameAndLore(escaped: String) = escaped.replaceAll("\\\\\\\\", Regex.quoteReplacement("\\")).replaceAll("\\\\@", Regex.quoteReplacement("@"))
+
+  private def nameAndLoreDelimIndex(nameAndLore: String): Int = {
+    var escapeEnabled = false
+    var i = 0
+    while (i < nameAndLore.length) {
+      nameAndLore.charAt(i) match {
+        case '\\' => escapeEnabled = !escapeEnabled
+        case '@' if !escapeEnabled => return i
+        case '@' if escapeEnabled => escapeEnabled = false
+        case _ => // Do nothing //
+      }
+      i += 1
+    }
+    -1
   }
 
   private def parseNBT: NBTTag = {
