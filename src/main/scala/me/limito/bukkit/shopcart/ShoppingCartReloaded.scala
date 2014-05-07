@@ -120,7 +120,7 @@ class ShoppingCartReloaded(val plugin: JavaPlugin) extends CommandExecutor {
 
   override def onCommand(sender: CommandSender, command: Command, label: String, args: Array[String]): Boolean = {
     args match {
-      case Array("reload") if sender.hasPermission("cart.reload") => reload()
+      case Array("reload") if sender.isOp && sender.hasPermission("cart.reload") => reload()
       case Array("get", itemId, itemAmount) =>
         val req = new RequestItemGive(sender, itemId.toInt, itemAmount.toInt)
         requestManager.handleRequest(req)
@@ -144,7 +144,7 @@ class ShoppingCartReloaded(val plugin: JavaPlugin) extends CommandExecutor {
       case Array() =>
         val req = new RequestItemsList(sender)
         requestManager.handleRequest(req)
-      case _ => return false
+      case _ => sender.sendMessage(lang.get("cart.help"))
     }
     true
   }
