@@ -11,7 +11,7 @@ import scala.Predef.augmentString
 import org.bukkit.entity.Player
 import collection.JavaConversions._
 import me.limito.bukkit.shopcart.optional.nbt.{PowerNBTHelper, NBTHelperStub, NBTHelper}
-import com.j256.ormlite.jdbc.JdbcConnectionSource
+import com.j256.ormlite.jdbc.{JdbcPooledConnectionSource, JdbcConnectionSource}
 import com.j256.ormlite.logger.LocalLog
 import org.bukkit.Bukkit
 
@@ -90,7 +90,12 @@ class ShoppingCartReloaded(val plugin: JavaPlugin) extends CommandExecutor {
       val connConfig = ConnectionConfig.fromYaml(section)
       val dbConfig = DatabaseConfig.fromYaml(section)
 
-      connectionSource = new JdbcConnectionSource(connConfig.url, connConfig.username, connConfig.password)
+      val source = new JdbcPooledConnectionSource(connConfig.url, connConfig.username, connConfig.password)
+      source.setTestBeforeGet(true)
+      source.setMaxConnectionsFree(2)
+      source
+      connectionSource = source
+
       dao = new CartItemInfoDao(connectionSource, dbConfig)
 
       dao.setupTableAndStatements()

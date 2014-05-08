@@ -1,14 +1,13 @@
 package me.limito.bukkit.shopcart.database
 
 import me.limito.bukkit.shopcart.items.CartItemInfo
-import com.j256.ormlite.jdbc.JdbcConnectionSource
 import com.j256.ormlite.dao.{DaoManager, Dao}
 import scala.collection.JavaConverters._
 import com.j256.ormlite.table.{TableUtils, DatabaseTableConfig}
 import com.j256.ormlite.stmt.SelectArg
-import com.j256.ormlite.field.DatabaseFieldConfig
+import com.j256.ormlite.support.ConnectionSource
 
-class CartItemInfoDao(connSource: JdbcConnectionSource, config: DatabaseConfig) extends DaoHelper {
+class CartItemInfoDao(connSource: ConnectionSource, config: DatabaseConfig) extends DaoHelper {
   var dao: Dao[CartItemInfo, Long] = _
 
   def setupTableAndStatements() {
