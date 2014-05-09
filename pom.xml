@@ -4,7 +4,7 @@
     <groupId>me.limito.bukkit</groupId>
     <artifactId>shopping-cart-reloaded</artifactId>
     <packaging>jar</packaging>
-    <version>1.2u3</version>
+    <version>1.2u4</version>
     <name>ShoppingCartReloaded</name>
 
     <properties>
@@ -124,6 +124,29 @@
                 <version>2.4.3</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <version>1.5.3</version>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <file>target/classes/plugin.yml</file>
+                    <replacements>
+                        <replacement>
+                            <token>AUTOVERSION</token>
+                            <value>${project.version}</value>
+                        </replacement>
+                    </replacements>
                 </configuration>
             </plugin>
         </plugins>

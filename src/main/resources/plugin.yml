@@ -1,6 +1,6 @@
 name: ShoppingCartReloaded
-version: 1.2u3
-description: Shopping cart is reloaded
+version: AUTOVERSION
+description: Plugin for giving items from web-shops
 author: limito
 
 main: me.limito.bukkit.shopcart.PluginPreloader
