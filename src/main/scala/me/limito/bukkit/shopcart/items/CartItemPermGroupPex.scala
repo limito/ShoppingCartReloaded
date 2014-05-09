@@ -4,6 +4,8 @@ import me.limito.bukkit.shopcart.{ShoppingCartReloaded, Lang}
 import org.bukkit.entity.Player
 import me.limito.bukkit.shopcart.Lang.{TimeDuration, WorldName}
 import ru.tehkode.permissions.bukkit.PermissionsEx
+import org.bukkit.inventory.ItemStack
+import org.bukkit.Material
 
 class CartItemPermGroupPex(groupName: String, worldName: Option[String] = None, lifetime: Option[Long]) extends CartItem {
   val extras = (worldName.map(WorldName) ++ lifetime.map(TimeDuration)).toList
@@ -30,4 +32,6 @@ class CartItemPermGroupPex(groupName: String, worldName: Option[String] = None, 
   }
 
   override def giveToPlayer(player: Player): Int = giveToPlayer(player, 1)
+
+  override def getIcon: ItemStack = new ItemStack(Material.BOOK)
 }

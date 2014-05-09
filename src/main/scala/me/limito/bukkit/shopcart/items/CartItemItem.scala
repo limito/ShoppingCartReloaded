@@ -15,6 +15,11 @@ class CartItemItem(val itemId: Int, val itemMeta: Short, val amount: Int, val en
   def giveToPlayer(player: Player):Int = giveToPlayer(player, amount)
 
   def giveToPlayer(player: Player, amount: Int):Int = {
+    val stack = stackToGive
+    give(player.getInventory, stack, amount, 0)
+  }
+
+  private def stackToGive: ItemStack = {
     val bstack = new ItemStack(itemId, 1, itemMeta)
     val stack = if (nbtTag != null) ShoppingCartReloaded.instance.nbtHelper.placeTag(nbtTag, bstack) else bstack
 
@@ -31,8 +36,7 @@ class CartItemItem(val itemId: Int, val itemMeta: Short, val amount: Int, val en
 
       stack.setItemMeta(meta)
     }
-
-    give(player.getInventory, stack, amount, 0)
+    stack
   }
 
   def getLocalizedName(lang: Lang): String = {
@@ -62,4 +66,6 @@ class CartItemItem(val itemId: Int, val itemMeta: Short, val amount: Int, val en
     else
       alreadyGiven + amountToGive - notGiven.values().iterator().next().getAmount
   }
+
+  override def getIcon: ItemStack = new ItemStack(stackToGive)
 }

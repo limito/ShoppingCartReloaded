@@ -93,7 +93,7 @@ class ShoppingCartReloaded(val plugin: JavaPlugin) extends CommandExecutor {
       val source = new JdbcPooledConnectionSource(connConfig.url, connConfig.username, connConfig.password)
       source.setTestBeforeGet(true)
       source.setMaxConnectionsFree(2)
-      source
+
       connectionSource = source
 
       dao = new CartItemInfoDao(connectionSource, dbConfig)
@@ -146,6 +146,7 @@ class ShoppingCartReloaded(val plugin: JavaPlugin) extends CommandExecutor {
           requestManager.handleRequest(req)
         } else sender.sendMessage(lang.get("cart-put.no-item"))
       case Array("load") => requestManager.handleRequest(new RequestLoadItem(sender, sender.getName))
+      case Array("gui") => requestManager.handleRequest(new RequestShowGui(sender))
       case Array() =>
         val req = new RequestItemsList(sender)
         requestManager.handleRequest(req)

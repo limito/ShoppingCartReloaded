@@ -4,7 +4,8 @@ import me.limito.bukkit.shopcart.{ShoppingCartReloaded, Lang}
 import org.bukkit.entity.Player
 import com.sk89q.worldguard.bukkit.{BukkitPlayer, WorldGuardPlugin}
 import org.bukkit.plugin.Plugin
-import org.bukkit.Bukkit
+import org.bukkit.{Material, Bukkit}
+import org.bukkit.inventory.ItemStack
 
 sealed abstract class WGMembershipType
 object WGMember extends WGMembershipType
@@ -52,4 +53,6 @@ class CartItemWG(regionName: String, membershipType: WGMembershipType, amount: I
       case _ => throw new RuntimeException("No WG!")
     }
   }
+
+  override def getIcon: ItemStack = new ItemStack(Material.WOOD_AXE)
 }
