@@ -23,7 +23,7 @@ class InventoryPager(val inv: Inventory) {
 
     var enoughSpace = true
     var list = items
-    do {
+    while (enoughSpace && !list.isEmpty) {
       // Try to add new item
       val item = list.head
       val newList = list.tail
@@ -34,7 +34,7 @@ class InventoryPager(val inv: Inventory) {
         list = notFitItem :: newList
         enoughSpace = false
       } else list = newList
-    } while (enoughSpace && !list.isEmpty)
+    }
 
     // Remove items from last freeSlots
     for (i <- (inv.getSize - 1) to (inv.getSize - freeSlots) by -1) {

@@ -7,7 +7,7 @@ import org.bukkit.inventory.{InventoryView, ItemStack}
 import me.limito.bukkit.shopcart.ShoppingCartReloaded
 import scala.collection.JavaConverters._
 import org.bukkit.event.{EventHandler, HandlerList, Listener}
-import org.bukkit.event.inventory.{DragType, InventoryDragEvent, InventoryCloseEvent, InventoryClickEvent}
+import org.bukkit.event.inventory.{InventoryCloseEvent, InventoryClickEvent}
 import org.bukkit.event.inventory.InventoryType.SlotType
 import me.limito.bukkit.shopcart.request.RequestItemGive
 
@@ -17,24 +17,24 @@ class CartInventory(player: Player, itemInfos: Seq[CartItemInfo]) extends Listen
     def get: ItemStack
   }
 
-  private val MaxGive = 64
-  private val invSize = 36
-  private val buttonsSlots = 2
+  protected val MaxGive = 64
+  protected val invSize = 36
+  protected val buttonsSlots = 2
 
-  private val inventory = Bukkit.getServer.createInventory(null, invSize, ShoppingCartReloaded.instance.lang.get("cart-gui.title"))
-  private var inventoryView: InventoryView = _
-  private val inventoryPager = new InventoryPager(inventory)
+  protected val inventory = Bukkit.getServer.createInventory(null, invSize, ShoppingCartReloaded.instance.lang.get("cart-gui.title"))
+  protected var inventoryView: InventoryView = _
+  protected val inventoryPager = new InventoryPager(inventory)
 
-  private def isPlayerSlot(rawSlot: Int) = rawSlot >= invSize
-  private def isCartSlot(rawSlot: Int) = rawSlot < invSize - buttonsSlots
-  private def isButtonSlot(rawSlot: Int) = rawSlot >= invSize - buttonsSlots
+  protected def isPlayerSlot(rawSlot: Int) = rawSlot >= invSize
+  protected def isCartSlot(rawSlot: Int) = rawSlot < invSize - buttonsSlots
+  protected def isButtonSlot(rawSlot: Int) = rawSlot >= invSize - buttonsSlots
 
-  private def invSlot(rawSlot: Int) = new StackSlot {
+  protected def invSlot(rawSlot: Int) = new StackSlot {
     override def get: ItemStack = inventory.getItem(rawSlot)
     override def set(stack: ItemStack): Unit = inventory.setItem(rawSlot, stack)
   }
 
-  def populateInventory() {
+  protected def populateInventory() {
     val items = itemInfos.map(_.toItem)
     val stacks = itemInfos zip items map(i => itemStackForItem(i._1, i._2))
     inventoryPager.populateInventory(stacks)
@@ -42,7 +42,7 @@ class CartInventory(player: Player, itemInfos: Seq[CartItemInfo]) extends Listen
     inventoryPager.selectPage(0)
   }
 
-  private def itemStackForItem(itemInfo: CartItemInfo, item: CartItem): ItemStack = {
+  protected def itemStackForItem(itemInfo: CartItemInfo, item: CartItem): ItemStack = {
     val name = item.getLocalizedName(ShoppingCartReloaded.instance.lang)
     val lore = List(
       "#" + itemInfo.id,
@@ -58,11 +58,11 @@ class CartInventory(player: Player, itemInfos: Seq[CartItemInfo]) extends Listen
     icon
   }
 
-  private def giveItem(infoId: Int, amount: Int) {
+  protected def giveItem(infoId: Int, amount: Int) {
     ShoppingCartReloaded.instance.requestManager.handleRequest(new RequestItemGive(player, infoId, amount))
   }
 
-  private def itemInfoIdFromItemStack(stack: ItemStack): Option[Long] = {
+  protected def itemInfoIdFromItemStack(stack: ItemStack): Option[Long] = {
     val meta = stack.getItemMeta
     val lore = meta.getLore
     if (lore != null && lore.size() >= 1) {
@@ -84,37 +84,6 @@ class CartInventory(player: Player, itemInfos: Seq[CartItemInfo]) extends Listen
 
     HandlerList.unregisterAll(this)
     player.closeInventory()
-  }
-
-  @EventHandler
-  def onInvDragged(event: InventoryDragEvent) {
-    if (!(event.getWhoClicked == player))
-      return
-    if (event.getRawSlots.size() > 1) {
-      event.setCancelled(true)
-      return
-    }
-
-    val rawSlot = event.getRawSlots.iterator().next().toInt
-    if (isCartSlot(rawSlot) && event.getOldCursor.getAmount > 0 && !itemInfoIdFromItemStack(event.getOldCursor).isDefined) {
-      // Load, not implemented
-      event.setCancelled(true)
-      return
-    }
-    if (isButtonSlot(rawSlot)) {
-      onButtonClick(rawSlot)
-      event.setCancelled(true)
-    }
-
-    if (isPlayerSlot(rawSlot)) {
-      val amount = if (event.getType == DragType.SINGLE) 1 else MaxGive
-      val slot = new StackSlot {
-        override def get: ItemStack = event.getOldCursor
-        override def set(stack: ItemStack): Unit = {}// Update not needed
-      }
-      if (giveItemAndUpdateStackInSlot(slot, amount))
-        event.setCancelled(true)
-    }
   }
 
   @EventHandler
@@ -159,7 +128,7 @@ class CartInventory(player: Player, itemInfos: Seq[CartItemInfo]) extends Listen
     }
   }
 
-  private def onButtonClick(rawSlot: Int) {
+  protected def onButtonClick(rawSlot: Int) {
     val index = rawSlot - (invSize - buttonsSlots)
     index match {
       case 0 => inventoryPager.previousPage()
@@ -167,7 +136,7 @@ class CartInventory(player: Player, itemInfos: Seq[CartItemInfo]) extends Listen
     }
   }
 
-  private def giveItemAndUpdateStackInSlot(stackSlot: StackSlot, maxAmount: Int): Boolean = {
+  protected def giveItemAndUpdateStackInSlot(stackSlot: StackSlot, maxAmount: Int): Boolean = {
     if (stackSlot.get == null)
       return false
 
