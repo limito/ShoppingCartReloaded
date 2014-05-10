@@ -7,7 +7,7 @@ import org.bukkit.inventory.{InventoryView, ItemStack}
 import me.limito.bukkit.shopcart.ShoppingCartReloaded
 import scala.collection.JavaConverters._
 import org.bukkit.event.{EventHandler, HandlerList, Listener}
-import org.bukkit.event.inventory.{InventoryCloseEvent, InventoryClickEvent}
+import org.bukkit.event.inventory.{ClickType, InventoryCloseEvent, InventoryClickEvent}
 import org.bukkit.event.inventory.InventoryType.SlotType
 import me.limito.bukkit.shopcart.request.RequestItemGive
 
@@ -91,6 +91,10 @@ class CartInventory(player: Player, itemInfos: Seq[CartItemInfo]) extends Listen
     if (!(event.getWhoClicked == player))
       return
 
+    if (event.getClick != ClickType.LEFT && event.getClick != ClickType.RIGHT && event.getClick != ClickType.SHIFT_LEFT) {
+      event.setCancelled(true)
+      return
+    }
     if (event.getSlotType == SlotType.OUTSIDE) {
       event.setCancelled(true)
       return
