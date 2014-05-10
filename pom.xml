@@ -4,7 +4,7 @@
     <groupId>me.limito.bukkit</groupId>
     <artifactId>shopping-cart-reloaded</artifactId>
     <packaging>jar</packaging>
-    <version>1.2u4</version>
+    <version>1.2u5</version>
     <name>ShoppingCartReloaded</name>
 
     <properties>

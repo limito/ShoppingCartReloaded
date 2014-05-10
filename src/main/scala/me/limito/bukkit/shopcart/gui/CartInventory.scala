@@ -27,7 +27,7 @@ class CartInventory(player: Player, itemInfos: Seq[CartItemInfo]) extends Listen
 
   protected def isPlayerSlot(rawSlot: Int) = rawSlot >= invSize
   protected def isCartSlot(rawSlot: Int) = rawSlot < invSize - buttonsSlots
-  protected def isButtonSlot(rawSlot: Int) = rawSlot >= invSize - buttonsSlots
+  protected def isButtonSlot(rawSlot: Int) = rawSlot >= invSize - buttonsSlots && rawSlot < invSize
 
   protected def invSlot(rawSlot: Int) = new StackSlot {
     override def get: ItemStack = inventory.getItem(rawSlot)
