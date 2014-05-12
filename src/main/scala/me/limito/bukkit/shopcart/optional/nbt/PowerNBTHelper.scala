@@ -31,14 +31,14 @@ class PowerNBTHelper extends NBTHelper {
   @throws[NBTParseException]
   override def parseJson(json: String): NBTTag = {
     try {
-      val nbt: NBTBase = JsonToNBTLegacy.parse(json)
+      val nbt: NBTBase = JsonToNBT.parse(json)
       return NBTTagImpl(nbt)
     } catch {
       case ex: NBTException => // Try another parser
     }
 
     try {
-      val nbt: NBTBase = JsonToNBT.parse(json)
+      val nbt: NBTBase = JsonToNBTLegacy.parse(json)
       NBTTagImpl(nbt)
     } catch {
       case ex: NBTException => throw new NBTParseException("Error parsing json", ex)
