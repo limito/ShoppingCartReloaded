@@ -4,6 +4,7 @@ description: Plugin for giving items from web-shops
 author: limito
 
 main: me.limito.bukkit.shopcart.PluginPreloader
+softdepend: [PowerNBT, PermissionsEx, Vault, WorldGuard]
 
 commands:
   cart:
