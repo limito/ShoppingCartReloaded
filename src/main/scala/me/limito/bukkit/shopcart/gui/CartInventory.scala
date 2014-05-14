@@ -80,7 +80,10 @@ class CartInventory(player: Player, itemInfos: Seq[CartItemInfo]) extends Listen
   }
 
   def close() {
-    player.setItemOnCursor(null)
+    val itemOnCursor = player.getItemOnCursor
+    if (itemInfoIdFromItemStack(itemOnCursor) != None) {
+      player.setItemOnCursor(null)
+    }
 
     HandlerList.unregisterAll(this)
     player.closeInventory()
@@ -125,7 +128,7 @@ class CartInventory(player: Player, itemInfos: Seq[CartItemInfo]) extends Listen
       val maxAmount = if (event.isRightClick) 1 else MaxGive
       val slot = new StackSlot {
         override def get: ItemStack = event.getCursor
-        override def set(stack: ItemStack): Unit = event.setCursor(stack) // Updated automatically
+        override def set(stack: ItemStack): Unit = event.setCursor(stack)
       }
       if (giveItemAndUpdateStackInSlot(slot, maxAmount))
         event.setCancelled(true)
