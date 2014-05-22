@@ -64,9 +64,8 @@ class CartInventory(player: Player, itemInfos: Seq[CartItemInfo]) extends Listen
 
   protected def itemInfoIdFromItemStack(stack: ItemStack): Option[Long] = {
     val meta = stack.getItemMeta
-    val lore = meta.getLore
-    if (lore != null && lore.size() >= 1) {
-      val idString = lore.get(0)
+    if (meta != null && meta.getLore != null && meta.getLore.size() >= 1) {
+      val idString = meta.getLore.get(0)
       val id = idString.substring(1).toInt
       Some(id)
     } else None
