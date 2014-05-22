@@ -104,7 +104,12 @@ class Lang {
       metaNames(meta)
     else if (itemsNames(id) != null)
       addMetaSuffix(itemsNames(id), meta)
-    else addMetaSuffix(Material.getMaterial(id).toString, meta)
+    else addMetaSuffix(getMaterialNameOrId(id), meta)
+  }
+
+  def getMaterialNameOrId(materialId: Int) = Material.getMaterial(materialId) match {
+    case m if m != null => m.toString
+    case null => materialId.toString
   }
 
   def formatEnchantments(ench: Array[LeveledEnchantment]):String = ench map(e => enchantmentTypes(e.id) + " " + romanNum(e.level)) mkString(ChatColor.AQUA.toString, ", ", "")

@@ -8,6 +8,7 @@ import me.limito.bukkit.shopcart.optional.nbt.NBTTag
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import java.util
+import org.bukkit.Material
 
 case class NameAndLore(name: String, lore: String)
 
@@ -16,27 +17,32 @@ class CartItemItem(val itemId: Int, val itemMeta: Short, val amount: Int, val en
 
   def giveToPlayer(player: Player, amount: Int):Int = {
     val stack = stackToGive
-    give(player.getInventory, stack, amount, 0)
+    if (stack.isDefined)
+      give(player.getInventory, stack.get, amount, 0)
+    else 0
   }
 
-  private def stackToGive: ItemStack = {
-    val bstack = new ItemStack(itemId, 1, itemMeta)
-    val stack = if (nbtTag != null) ShoppingCartReloaded.instance.nbtHelper.placeTag(nbtTag, bstack) else bstack
+  private def stackToGive: Option[ItemStack] = {
+    val material = Material.getMaterial(itemId)
+    if (material != null) {
+      val bstack = new ItemStack(material, 1, itemMeta)
+      val stack = if (nbtTag != null) ShoppingCartReloaded.instance.nbtHelper.placeTag(nbtTag, bstack) else bstack
 
-    if (enchantments != null)
-      enchantments foreach(e => stack.addUnsafeEnchantment(Enchantment.getById(e.id), e.level))
-    if (nameAndLoreOption.isDefined) {
-      val nameAndLore = nameAndLoreOption.get
-      val meta = stack.getItemMeta
+      if (enchantments != null)
+        enchantments foreach(e => stack.addUnsafeEnchantment(Enchantment.getById(e.id), e.level))
+      if (nameAndLoreOption.isDefined) {
+        val nameAndLore = nameAndLoreOption.get
+        val meta = stack.getItemMeta
 
-      if (nameAndLore.name != null)
-        meta.setDisplayName(nameAndLore.name)
-      if (nameAndLore.lore != null)
-        meta.setLore(nameAndLore.lore.split('\n').toList.asJava)
+        if (nameAndLore.name != null)
+          meta.setDisplayName(nameAndLore.name)
+        if (nameAndLore.lore != null)
+          meta.setLore(nameAndLore.lore.split('\n').toList.asJava)
 
-      stack.setItemMeta(meta)
-    }
-    stack
+        stack.setItemMeta(meta)
+      }
+      Some(stack)
+    } else None
   }
 
   def getLocalizedName(lang: Lang): String = {
@@ -67,5 +73,8 @@ class CartItemItem(val itemId: Int, val itemMeta: Short, val amount: Int, val en
       alreadyGiven + amountToGive - notGiven.values().iterator().next().getAmount
   }
 
-  override def getIcon: ItemStack = new ItemStack(stackToGive)
+  override def getIcon: ItemStack = stackToGive match {
+    case Some(stack) => new ItemStack(stack)
+    case None => super.getIcon
+  }
 }
