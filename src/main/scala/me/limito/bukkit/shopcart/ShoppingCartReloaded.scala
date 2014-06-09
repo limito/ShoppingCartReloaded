@@ -82,6 +82,8 @@ class ShoppingCartReloaded(val plugin: JavaPlugin) extends CommandExecutor {
   def initDatabase() {
     try {
       plugin.saveDefaultConfig()
+      plugin.reloadConfig()
+
       val section = plugin.getConfig.getConfigurationSection("db")
 
       val ormliteLogFile = new File(plugin.getDataFolder, "ormlite.log")
@@ -125,7 +127,7 @@ class ShoppingCartReloaded(val plugin: JavaPlugin) extends CommandExecutor {
 
   override def onCommand(sender: CommandSender, command: Command, label: String, args: Array[String]): Boolean = {
     args match {
-      case Array("reload") if sender.isOp && sender.hasPermission("cart.reload") => reload()
+      case Array("reload") if sender.isOp || sender.hasPermission("cart.reload") => reload()
       case Array("get", itemId, itemAmount) =>
         val req = new RequestItemGive(sender, itemId.toInt, itemAmount.toInt)
         requestManager.handleRequest(req)
