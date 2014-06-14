@@ -25,7 +25,7 @@ class CartItemItem(val itemId: Int, val itemMeta: Short, val amount: Int, val en
   private def stackToGive: Option[ItemStack] = {
     val material = Material.getMaterial(itemId)
     if (material != null) {
-      val bstack = new ItemStack(material, 1, itemMeta)
+      val bstack = wrapInCraftStack(new ItemStack(material, 1, itemMeta))
       val stack = if (nbtTag != null) ShoppingCartReloaded.instance.nbtHelper.placeTag(nbtTag, bstack) else bstack
 
       if (enchantments != null)
@@ -76,5 +76,11 @@ class CartItemItem(val itemId: Int, val itemMeta: Short, val amount: Int, val en
   override def getIcon: ItemStack = stackToGive match {
     case Some(stack) => new ItemStack(stack)
     case None => super.getIcon
+  }
+
+  private def wrapInCraftStack(stack: ItemStack): ItemStack = {
+    val inv: Inventory = ShoppingCartReloaded.instance.getServer.createInventory(null, 9)
+    inv.addItem(stack)
+    inv.getItem(0)
   }
 }
