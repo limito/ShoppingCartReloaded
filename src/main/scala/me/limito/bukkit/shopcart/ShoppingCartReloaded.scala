@@ -7,13 +7,12 @@ import org.bukkit.configuration.file.YamlConfiguration
 import java.util.logging.Level
 import org.bukkit.command.{CommandExecutor, Command, CommandSender}
 import request._
-import scala.Predef.augmentString
-import org.bukkit.entity.Player
 import collection.JavaConversions._
 import me.limito.bukkit.shopcart.optional.nbt.{PowerNBTHelper, NBTHelperStub, NBTHelper}
 import com.j256.ormlite.jdbc.{JdbcPooledConnectionSource, JdbcConnectionSource}
 import com.j256.ormlite.logger.LocalLog
 import org.bukkit.Bukkit
+import net.minezrc.framework.test.CommandFramework
 
 class ShoppingCartReloaded(val plugin: JavaPlugin) extends CommandExecutor {
   ShoppingCartReloaded.instance = this
@@ -22,12 +21,18 @@ class ShoppingCartReloaded(val plugin: JavaPlugin) extends CommandExecutor {
   var lang: Lang = _
   var dao: CartItemInfoDao = _
   var connectionSource: JdbcConnectionSource = _
-
   var nbtHelper: NBTHelper = _
+  var commandFramework: CommandFramework = _
 
   def onEnable() {
+    commandFramework = new CommandFramework(plugin)
+    commandFramework.registerCommands(new Commands(this))
+
     reload()
-    plugin.getServer.getPluginCommand("cart").setExecutor(this)
+  }
+
+  override def onCommand(sender: CommandSender, command: Command, label: String, args: Array[String]): Boolean = {
+    commandFramework.handleCommand(sender, label, command, args)
   }
 
   def onDisable() {
@@ -56,6 +61,7 @@ class ShoppingCartReloaded(val plugin: JavaPlugin) extends CommandExecutor {
     try {
       val config = loadYamlAndMerge("messages.yml")
       lang.read(config)
+      commandFramework.setNoPermMessage(lang.get("cart.no-perms"))
     } catch {
       case e: Exception => getLogger.log(Level.SEVERE, s"Error loading messages", e)
     }
@@ -123,38 +129,6 @@ class ShoppingCartReloaded(val plugin: JavaPlugin) extends CommandExecutor {
         getLogger.info("PowerNBT not detected")
         nbtHelper = new NBTHelperStub
     }
-  }
-
-  override def onCommand(sender: CommandSender, command: Command, label: String, args: Array[String]): Boolean = {
-    args match {
-      case Array("reload") if sender.isOp || sender.hasPermission("cart.reload") => reload()
-      case Array("get", itemId, itemAmount) =>
-        val req = new RequestItemGive(sender, itemId.toInt, itemAmount.toInt)
-        requestManager.handleRequest(req)
-      case Array("get", itemId) =>
-        val req = new RequestItemGive(sender, itemId.toInt, Int.MaxValue)
-        requestManager.handleRequest(req)
-      case Array("all") =>
-        val req = new RequestGiveAll(sender)
-        requestManager.handleRequest(req)
-      case Array("put", params @ _*) if sender.isInstanceOf[Player] =>
-        val stack = sender.asInstanceOf[Player].getItemInHand
-
-        if (stack != null && stack.getTypeId > 0) {
-          val owner = if (params.length >= 1) params(0) else sender.getName
-          val amount = if (params.length >= 2) params(1).toInt else stack.getAmount
-
-          val req = new RequestPutItem(sender, owner, stack.clone(), amount)
-          requestManager.handleRequest(req)
-        } else sender.sendMessage(lang.get("cart-put.no-item"))
-      case Array("load") => requestManager.handleRequest(new RequestLoadItem(sender, sender.getName))
-      case Array("gui") => requestManager.handleRequest(new RequestShowGui(sender))
-      case Array() =>
-        val req = new RequestItemsList(sender)
-        requestManager.handleRequest(req)
-      case _ => sender.sendMessage(lang.get("cart.help"))
-    }
-    true
   }
 
   private def loadYamlOrDefault(resource: String): YamlConfiguration = {

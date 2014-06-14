@@ -1,5 +1,7 @@
 package me.limito.bukkit.shopcart;
 
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.mcstats.Metrics;
 
@@ -66,6 +68,11 @@ public class PluginPreloader extends JavaPlugin {
         sc = new ShoppingCartReloaded(this);
         sc.onEnable();
         runMetrics();
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        return sc.onCommand(sender, command, label, args);
     }
 
     private void runMetrics() {
